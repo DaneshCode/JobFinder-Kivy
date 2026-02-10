@@ -12,7 +12,7 @@ source.include_exts = py,png,jpg,kv,atlas,json,db
 version = 1.0.0
 
 # Application requirements
-requirements = python3,kivy>=2.3.0,kivymd,pillow,materialyoucolor,android,pyjnius
+requirements = python3,kivy==2.3.0,kivymd==2.0.1.dev0,pillow,materialyoucolor,exceptiongroup,android,pyjnius
 
 # Android configuration
 android.permissions = INTERNET,WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE
