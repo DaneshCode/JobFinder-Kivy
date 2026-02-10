@@ -79,8 +79,7 @@ Builder.load_string(
 
             MDLabel:
                 text: root.country
-                size_hint_x: None
-                width: min(self.texture_size[0], dp(100))
+                adaptive_width: True
                 shorten: True
                 font_style: "Label"
                 role: "large"
@@ -101,8 +100,7 @@ Builder.load_string(
 
             MDLabel:
                 text: root.category
-                size_hint_x: None
-                width: min(self.texture_size[0], dp(120))
+                adaptive_width: True
                 shorten: True
                 font_style: "Label"
                 role: "large"
