@@ -48,9 +48,10 @@ ios.ios_deploy_branch = 1.12.2
 osx.python_version = 3
 osx.kivy_version = 2.3.0
 
+[buildozer]
 # Buildozer settings
 log_level = 2
-warn_on_root = 1
+warn_on_root = 0
 
 # Build directory
 # build_dir = ./.buildozer
