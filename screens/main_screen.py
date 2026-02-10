@@ -150,6 +150,21 @@ Builder.load_string(
                         size_hint_y: None
                         height: dp(50)
 
+                    # Category filter chips (horizontal scroll)
+                    MDScrollView:
+                        do_scroll_x: True
+                        do_scroll_y: False
+                        size_hint_y: None
+                        height: dp(50)
+
+                        MDBoxLayout:
+                            id: category_chips
+                            orientation: "horizontal"
+                            size_hint_x: None
+                            width: self.minimum_width
+                            spacing: dp(8)
+                            padding: dp(4)
+
                     # Search input
                     MDTextField:
                         id: search_field
@@ -381,6 +396,12 @@ class MainScreen(MDScreen):
             self.ids.welcome_label.text = f"Welcome, {app.current_user.name}!"
             self.update_profile()
 
+        # Initialize selected category
+        self.selected_category = "All"
+
+        # Load category chips
+        self.load_category_chips()
+
         # Load jobs
         self.load_jobs()
         self.load_featured_jobs()
@@ -399,9 +420,39 @@ class MainScreen(MDScreen):
             self.ids.content_manager.current = tab_map[item_text]
 
             if item_text == "Search":
+                self.load_category_chips()
                 self.load_jobs()
             elif item_text == "Profile":
                 self.update_profile()
+
+    def load_category_chips(self):
+        """Load category filter chips"""
+        from database import DatabaseManager
+        from kivymd.uix.chip import MDChip, MDChipLeadingIcon, MDChipText
+
+        db = DatabaseManager()
+        categories = ["All"] + db.get_all_categories()
+
+        chips_container = self.ids.category_chips
+        chips_container.clear_widgets()
+
+        for category in categories:
+            chip = MDChip(
+                MDChipLeadingIcon(
+                    icon="check" if category == self.selected_category else "tag"
+                ),
+                MDChipText(text=category),
+                type="filter",
+                active=category == self.selected_category,
+                on_release=lambda x, cat=category: self.on_category_select(cat),
+            )
+            chips_container.add_widget(chip)
+
+    def on_category_select(self, category):
+        """Handle category selection"""
+        self.selected_category = category
+        self.load_category_chips()  # Refresh chips to show selection
+        self.load_jobs(self.ids.search_field.text)  # Reload jobs with filter
 
     def update_profile(self):
         """Update profile information"""
@@ -436,13 +487,17 @@ class MainScreen(MDScreen):
 
         db = DatabaseManager()
 
-        if keyword:
-            jobs = db.search_jobs(keyword)
+        # Get selected category
+        category = getattr(self, "selected_category", "All")
+
+        if keyword or (category and category != "All"):
+            jobs = db.search_jobs_with_category(keyword if keyword else "", category)
         else:
             jobs = db.get_all_jobs()
 
         # Update results label
-        self.ids.results_label.text = f"Found {len(jobs)} jobs"
+        category_text = f" in {category}" if category and category != "All" else ""
+        self.ids.results_label.text = f"Found {len(jobs)} jobs{category_text}"
 
         # Clear and populate jobs list
         jobs_list = self.ids.jobs_list

@@ -128,181 +128,175 @@ class DatabaseManager:
     def _seed_jobs(self):
         """Seed sample job listings"""
         jobs = [
+            # ============ Computer Engineering ============
             (
                 "Senior Python Developer",
-                "Software Development",
+                "Computer Engineering",
                 "TechCorp Inc.",
                 "United States",
                 120000,
                 "We are looking for an experienced Python developer to join our team. You will work on cutting-edge projects using Django, FastAPI, and machine learning technologies.",
             ),
             (
-                "Frontend React Developer",
-                "Software Development",
-                "WebSolutions Ltd.",
-                "Canada",
-                95000,
-                "Join our frontend team to build beautiful user interfaces using React, TypeScript, and modern CSS frameworks.",
-            ),
-            (
-                "Data Scientist",
-                "Data Science",
-                "Analytics Pro",
-                "United Kingdom",
-                110000,
-                "Analyze large datasets and build predictive models using Python, TensorFlow, and scikit-learn.",
-            ),
-            (
-                "DevOps Engineer",
-                "Operations",
-                "CloudFirst Systems",
-                "Germany",
-                100000,
-                "Manage cloud infrastructure on AWS/Azure, implement CI/CD pipelines, and ensure system reliability.",
-            ),
-            (
-                "Mobile App Developer",
-                "Mobile Development",
-                "AppMakers Inc.",
-                "Australia",
-                90000,
-                "Develop cross-platform mobile applications using Flutter or React Native for iOS and Android.",
-            ),
-            (
-                "UI/UX Designer",
-                "Design",
-                "Creative Studio",
-                "Netherlands",
-                75000,
-                "Create stunning user experiences and interfaces for web and mobile applications.",
-            ),
-            (
-                "Backend Java Developer",
-                "Software Development",
-                "Enterprise Solutions",
-                "United States",
-                115000,
-                "Build scalable backend services using Java, Spring Boot, and microservices architecture.",
-            ),
-            (
-                "Machine Learning Engineer",
-                "AI/ML",
-                "AI Innovations",
-                "Canada",
-                130000,
-                "Develop and deploy machine learning models for production systems using PyTorch and MLOps tools.",
-            ),
-            (
                 "Full Stack Developer",
-                "Software Development",
+                "Computer Engineering",
                 "StartupX",
                 "Israel",
                 85000,
                 "Work on both frontend and backend using Node.js, React, and PostgreSQL in a fast-paced startup environment.",
             ),
+            # ============ Architecture ============
             (
-                "Cloud Architect",
-                "Cloud Computing",
-                "CloudScale Corp.",
+                "Senior Architect",
+                "Architecture",
+                "DesignBuild Studio",
                 "United States",
-                150000,
-                "Design and implement cloud-native solutions on AWS, with focus on security and scalability.",
+                95000,
+                "Lead architectural design projects for commercial and residential buildings with sustainable design focus.",
             ),
             (
-                "Cybersecurity Analyst",
-                "Security",
-                "SecureNet Ltd.",
+                "Interior Designer",
+                "Architecture",
+                "Modern Interiors",
                 "United Kingdom",
-                95000,
-                "Monitor and protect company systems from cyber threats, conduct security audits and penetration testing.",
-            ),
-            (
-                "Product Manager",
-                "Product",
-                "ProductHub",
-                "Germany",
-                100000,
-                "Lead product development from ideation to launch, work with cross-functional teams.",
-            ),
-            (
-                "iOS Developer",
-                "Mobile Development",
-                "AppleTech Solutions",
-                "United States",
-                125000,
-                "Build native iOS applications using Swift and SwiftUI for iPhone and iPad.",
-            ),
-            (
-                "Android Developer",
-                "Mobile Development",
-                "DroidWorks",
-                "India",
-                45000,
-                "Develop Android applications using Kotlin and Jetpack Compose.",
-            ),
-            (
-                "Database Administrator",
-                "Database",
-                "DataCore Systems",
-                "Canada",
-                90000,
-                "Manage and optimize PostgreSQL and MongoDB databases for high-performance applications.",
-            ),
-            (
-                "QA Engineer",
-                "Quality Assurance",
-                "QualityFirst",
-                "Poland",
                 55000,
-                "Design and execute test plans, automate testing using Selenium and pytest.",
+                "Create innovative interior designs for luxury homes and commercial spaces.",
             ),
+            # ============ Civil Engineering ============
             (
-                "Technical Writer",
-                "Documentation",
-                "DocuTech",
-                "Remote",
-                65000,
-                "Create technical documentation, API guides, and user manuals for software products.",
-            ),
-            (
-                "Blockchain Developer",
-                "Blockchain",
-                "CryptoTech",
-                "Singapore",
-                140000,
-                "Develop smart contracts and DeFi applications using Solidity and Web3 technologies.",
-            ),
-            (
-                "Game Developer",
-                "Game Development",
-                "GameStudio Pro",
-                "Japan",
-                80000,
-                "Create engaging games using Unity or Unreal Engine with C# or C++.",
-            ),
-            (
-                "Site Reliability Engineer",
-                "Operations",
-                "ReliableTech",
+                "Structural Engineer",
+                "Civil Engineering",
+                "StructureTech",
                 "United States",
-                135000,
-                "Ensure system reliability, implement monitoring solutions, and manage incident response.",
+                88000,
+                "Design and analyze structural systems for bridges, buildings, and infrastructure projects.",
             ),
             (
-                "Embedded Systems Engineer",
-                "Embedded",
-                "IoT Solutions",
+                "Construction Manager",
+                "Civil Engineering",
+                "BuildMaster Corp.",
                 "Germany",
-                95000,
-                "Develop firmware for IoT devices using C/C++ and embedded Linux.",
+                92000,
+                "Oversee construction projects ensuring quality, safety, and budget compliance.",
+            ),
+            # ============ Accounting ============
+            (
+                "Senior Accountant",
+                "Accounting",
+                "FinanceFirst Corp.",
+                "United States",
+                75000,
+                "Manage financial records, prepare reports, and ensure regulatory compliance.",
             ),
             (
-                "Network Engineer",
-                "Networking",
-                "NetConnect",
+                "Tax Specialist",
+                "Accounting",
+                "TaxPro Advisors",
+                "Canada",
+                82000,
+                "Provide tax planning and compliance services for corporate clients.",
+            ),
+            # ============ Electrical Engineering ============
+            (
+                "Power Systems Engineer",
+                "Electrical Engineering",
+                "PowerGrid Corp.",
+                "United States",
+                92000,
+                "Design and maintain electrical power generation and distribution systems.",
+            ),
+            (
+                "Electronics Engineer",
+                "Electrical Engineering",
+                "CircuitTech",
+                "Japan",
+                78000,
+                "Design electronic circuits and components for consumer products.",
+            ),
+            # ============ Mechanical Engineering ============
+            (
+                "HVAC Engineer",
+                "Mechanical Engineering",
+                "ClimateControl Inc.",
+                "United States",
+                78000,
+                "Design heating, ventilation, and air conditioning systems for buildings.",
+            ),
+            (
+                "Automotive Engineer",
+                "Mechanical Engineering",
+                "AutoDesign Corp.",
+                "Germany",
+                88000,
+                "Design and develop automotive components and systems.",
+            ),
+            # ============ Healthcare ============
+            (
+                "Registered Nurse",
+                "Healthcare",
+                "CityMedical Hospital",
+                "United States",
+                72000,
+                "Provide patient care and coordinate with healthcare team members.",
+            ),
+            (
+                "Pharmacist",
+                "Healthcare",
+                "PharmaCare",
                 "Australia",
+                98000,
+                "Dispense medications and provide pharmaceutical consultation.",
+            ),
+            # ============ Law ============
+            (
+                "Corporate Lawyer",
+                "Law",
+                "LegalEagle LLP",
+                "United States",
+                145000,
+                "Provide legal counsel on corporate transactions and compliance.",
+            ),
+            (
+                "Immigration Lawyer",
+                "Law",
+                "VisaExperts",
+                "Canada",
+                88000,
+                "Assist clients with immigration applications and legal issues.",
+            ),
+            # ============ Marketing ============
+            (
+                "Digital Marketing Manager",
+                "Marketing",
+                "DigitalGrowth Inc.",
+                "United States",
                 85000,
-                "Design and maintain network infrastructure, implement security protocols.",
+                "Lead digital marketing campaigns across multiple channels.",
+            ),
+            (
+                "SEO Specialist",
+                "Marketing",
+                "SearchRank Pro",
+                "Canada",
+                62000,
+                "Optimize website content for search engine visibility.",
+            ),
+            # ============ Education ============
+            (
+                "University Professor",
+                "Education",
+                "StateUniversity",
+                "Canada",
+                95000,
+                "Conduct research and teach undergraduate and graduate courses.",
+            ),
+            (
+                "Corporate Trainer",
+                "Education",
+                "SkillUp Training",
+                "Japan",
+                58000,
+                "Develop and deliver professional training programs.",
             ),
         ]
 
@@ -553,6 +547,80 @@ class DatabaseManager:
                 created_at=row["created_at"],
             )
         return None
+
+    def get_all_categories(self) -> List[str]:
+        """Get all unique job categories"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT DISTINCT category FROM jobs ORDER BY category")
+        rows = cursor.fetchall()
+        return [row["category"] for row in rows]
+
+    def get_jobs_by_category(self, category: str) -> List[Job]:
+        """Get jobs filtered by category"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT * FROM jobs WHERE category = ? ORDER BY created_at DESC",
+            (category,),
+        )
+        rows = cursor.fetchall()
+        return [
+            Job(
+                id=row["id"],
+                title=row["title"],
+                category=row["category"],
+                company=row["company"],
+                country=row["country"],
+                salary=row["salary"],
+                description=row["description"],
+                created_at=row["created_at"],
+            )
+            for row in rows
+        ]
+
+    def search_jobs_with_category(
+        self, keyword: str, category: str = None
+    ) -> List[Job]:
+        """Search jobs by keyword with optional category filter"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        search_term = f"%{keyword}%"
+
+        if category and category != "All":
+            cursor.execute(
+                """
+                SELECT * FROM jobs
+                WHERE category = ? AND (title LIKE ? OR company LIKE ? OR country LIKE ? OR description LIKE ?)
+                ORDER BY created_at DESC
+                """,
+                (category, search_term, search_term, search_term, search_term),
+            )
+        else:
+            cursor.execute(
+                """
+                SELECT * FROM jobs
+                WHERE title LIKE ? OR category LIKE ? OR company LIKE ?
+                      OR country LIKE ? OR description LIKE ?
+                ORDER BY created_at DESC
+                """,
+                (search_term, search_term, search_term, search_term, search_term),
+            )
+
+        rows = cursor.fetchall()
+        return [
+            Job(
+                id=row["id"],
+                title=row["title"],
+                category=row["category"],
+                company=row["company"],
+                country=row["country"],
+                salary=row["salary"],
+                description=row["description"],
+                created_at=row["created_at"],
+            )
+            for row in rows
+        ]
 
     # Advertisement operations
     def get_active_advertisements(self) -> List[Advertisement]:
