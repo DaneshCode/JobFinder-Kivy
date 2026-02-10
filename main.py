@@ -1,15 +1,15 @@
 """
-Job Finder Application
-A modern, professional job-finding application built with KivyMD
+برنامه جاب فایندر
+یک اپلیکیشن مدرن و حرفه‌ای برای جستجوی شغل ساخته شده با KivyMD
 
-Author: Job Finder Team
-Version: 1.0.0
+نویسنده: تیم جاب فایندر
+نسخه: 1.0.0
 """
 
 import os
 import sys
 
-# Set environment variables before importing Kivy
+# تنظیم متغیرهای محیطی قبل از ایمپورت کیوی
 os.environ["KIVY_LOG_LEVEL"] = "info"
 
 from kivy.core.window import Window
@@ -18,35 +18,37 @@ from kivy.lang import Builder
 from kivymd.app import MDApp
 
 
-# Set window size for desktop (ignored on mobile)
+# تنظیم اندازه پنجره برای دسکتاپ (در موبایل نادیده گرفته می‌شود)
 if sys.platform in ("win32", "linux", "darwin"):
     Window.size = (400, 750)
     Window.minimum_width = 350
     Window.minimum_height = 600
 
 
+# کلاس اصلی اپلیکیشن جاب فایندر
 class JobFinderApp(MDApp):
-    """Main Job Finder Application"""
+    """کلاس اصلی برنامه جاب فایندر"""
 
-    # Current logged in user
+    # کاربر فعلی که وارد شده
     current_user = None
-    # Currently selected job for detail view
+    # شغل انتخاب شده برای نمایش جزئیات
     selected_job = None
 
+    # ساخت رابط کاربری اپلیکیشن
     def build(self):
-        """Build the application"""
-        # Set theme
+        """ساخت اپلیکیشن"""
+        # تنظیم تم برنامه
         self.theme_cls.theme_style = "Dark"
         self.theme_cls.primary_palette = "Teal"
 
-        # Import and register screens
+        # ایمپورت و ثبت صفحات مختلف برنامه
         from screens.welcome_screen import WelcomeScreen
         from screens.login_screen import LoginScreen
         from screens.register_screen import RegisterScreen
         from screens.main_screen import MainScreen
         from screens.job_detail_screen import JobDetailScreen
 
-        # Build main layout
+        # ساخت لایه اصلی برنامه با مدیر صفحات
         root = Builder.load_string(
             """
 MDScreenManager:
@@ -66,18 +68,20 @@ MDScreenManager:
 
         return root
 
+    # اجرا شدن بعد از شروع برنامه
     def on_start(self):
-        """Called when the application starts"""
-        # Initialize database
+        """فراخوانی هنگام شروع برنامه"""
+        # راه‌اندازی دیتابیس
         from database import DatabaseManager
 
         db = DatabaseManager()
 
+    # تغییر صفحه با انیمیشن
     def switch_screen(self, screen_name, direction="left"):
-        """Switch to a different screen with animation"""
+        """تغییر صفحه فعلی با انیمیشن"""
         screen_manager = self.root
 
-        # Determine animation direction based on navigation
+        # تعیین جهت انیمیشن بر اساس مسیر ناوبری
         if screen_name in ("welcome", "login"):
             if screen_manager.current in ("main", "job_detail", "register"):
                 direction = "right"
@@ -88,16 +92,18 @@ MDScreenManager:
         screen_manager.transition.direction = direction
         screen_manager.current = screen_name
 
+    # پاکسازی منابع هنگام بسته شدن برنامه
     def on_stop(self):
-        """Called when the application stops"""
+        """فراخوانی هنگام بسته شدن برنامه"""
         from database import DatabaseManager
 
         db = DatabaseManager()
         db.close()
 
 
+# نقطه ورود اصلی برنامه
 def main():
-    """Application entry point"""
+    """نقطه ورود اصلی برنامه"""
     JobFinderApp().run()
 
 

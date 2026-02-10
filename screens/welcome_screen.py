@@ -1,5 +1,5 @@
 """
-Welcome Screen - First screen shown on app launch
+صفحه خوش‌آمدگویی - اولین صفحه‌ای که هنگام اجرای برنامه نمایش داده می‌شود
 """
 
 from kivy.lang import Builder
@@ -8,6 +8,7 @@ from kivy.clock import Clock
 from kivymd.uix.screen import MDScreen
 
 
+# بارگذاری رابط کاربری صفحه خوش‌آمدگویی با زبان KV
 Builder.load_string(
     """
 <WelcomeScreen>:
@@ -17,11 +18,11 @@ Builder.load_string(
         orientation: "vertical"
         md_bg_color: app.theme_cls.backgroundColor
 
-        # Spacer
+        # فضای خالی بالا
         Widget:
             size_hint_y: 0.15
 
-        # Logo and title area
+        # ناحیه لوگو و عنوان برنامه
         MDBoxLayout:
             orientation: "vertical"
             size_hint_y: 0.35
@@ -55,11 +56,11 @@ Builder.load_string(
                 theme_text_color: "Secondary"
                 opacity: 0
 
-        # Spacer
+        # فضای خالی میانی
         Widget:
             size_hint_y: 0.1
 
-        # Buttons area
+        # ناحیه دکمه‌های ورود و ثبت‌نام
         MDBoxLayout:
             id: buttons_box
             orientation: "vertical"
@@ -68,6 +69,7 @@ Builder.load_string(
             spacing: dp(15)
             opacity: 0
 
+            # دکمه ورود به حساب کاربری
             MDButton:
                 style: "filled"
                 size_hint_x: 1
@@ -81,6 +83,7 @@ Builder.load_string(
                     text: "Login"
                     font_style: "Title"
 
+            # دکمه ساخت حساب کاربری جدید
             MDButton:
                 style: "outlined"
                 size_hint_x: 1
@@ -94,7 +97,7 @@ Builder.load_string(
                     text: "Create Account"
                     font_style: "Title"
 
-        # Footer
+        # فوتر برنامه - نمایش کپی‌رایت
         MDBoxLayout:
             size_hint_y: 0.1
             padding: dp(20)
@@ -109,33 +112,36 @@ Builder.load_string(
 )
 
 
+# کلاس صفحه خوش‌آمدگویی با انیمیشن‌های ورودی
 class WelcomeScreen(MDScreen):
-    """Welcome/Home screen with app introduction"""
+    """صفحه خوش‌آمدگویی با معرفی برنامه"""
 
+    # اجرای انیمیشن‌ها هنگام ورود به صفحه
     def on_enter(self):
-        """Animate elements when screen is shown"""
+        """اجرای انیمیشن‌ها هنگام نمایش صفحه"""
         Clock.schedule_once(self._start_animations, 0.2)
 
+    # شروع انیمیشن‌های ورودی عناصر صفحه
     def _start_animations(self, dt):
-        """Start entrance animations"""
-        # Animate logo
+        """شروع انیمیشن‌های ورودی"""
+        # انیمیشن لوگو
         logo = self.ids.logo_icon
         anim_logo = Animation(opacity=1, duration=0.5)
         anim_logo.start(logo)
 
-        # Animate title with delay
+        # انیمیشن عنوان با تاخیر
         title = self.ids.title_label
         Clock.schedule_once(
             lambda dt: Animation(opacity=1, duration=0.5).start(title), 0.2
         )
 
-        # Animate subtitle with delay
+        # انیمیشن زیرعنوان با تاخیر بیشتر
         subtitle = self.ids.subtitle_label
         Clock.schedule_once(
             lambda dt: Animation(opacity=1, duration=0.5).start(subtitle), 0.4
         )
 
-        # Animate buttons with delay
+        # انیمیشن دکمه‌ها با تاخیر بیشتر
         buttons = self.ids.buttons_box
         Clock.schedule_once(
             lambda dt: Animation(opacity=1, duration=0.5).start(buttons), 0.6

@@ -1,5 +1,5 @@
 """
-Login Screen - User authentication
+صفحه ورود - احراز هویت کاربران
 """
 
 from kivy.lang import Builder
@@ -8,6 +8,7 @@ from kivy.clock import Clock
 from kivymd.uix.screen import MDScreen
 
 
+# بارگذاری رابط کاربری صفحه ورود با زبان KV
 Builder.load_string(
     """
 <LoginScreen>:
@@ -19,7 +20,7 @@ Builder.load_string(
         padding: dp(20)
         spacing: dp(20)
 
-        # Top bar
+        # نوار بالای صفحه شامل دکمه برگشت و عنوان
         MDBoxLayout:
             size_hint_y: None
             height: dp(56)
@@ -35,11 +36,11 @@ Builder.load_string(
                 role: "small"
                 valign: "center"
 
-        # Spacer
+        # فضای خالی بالا
         Widget:
             size_hint_y: 0.05
 
-        # Login card
+        # کارت ورود شامل فرم ایمیل و رمز عبور
         MDCard:
             id: login_card
             orientation: "vertical"
@@ -50,6 +51,7 @@ Builder.load_string(
             style: "elevated"
             opacity: 0
 
+            # آیکون کاربر
             MDIcon:
                 icon: "account-circle"
                 halign: "center"
@@ -57,12 +59,14 @@ Builder.load_string(
                 theme_text_color: "Custom"
                 text_color: app.theme_cls.primaryColor
 
+            # عنوان خوش‌آمدگویی
             MDLabel:
                 text: "Welcome Back!"
                 halign: "center"
                 font_style: "Headline"
                 role: "small"
 
+            # فیلد ایمیل
             MDTextField:
                 id: email_field
                 mode: "outlined"
@@ -74,11 +78,13 @@ Builder.load_string(
                 MDTextFieldHintText:
                     text: "Email"
 
+            # ردیف فیلد رمز عبور و دکمه نمایش/مخفی کردن
             MDBoxLayout:
                 size_hint_y: None
                 height: dp(56)
                 spacing: dp(8)
 
+                # فیلد رمز عبور
                 MDTextField:
                     id: password_field
                     mode: "outlined"
@@ -91,12 +97,14 @@ Builder.load_string(
                     MDTextFieldHintText:
                         text: "Password"
 
+                # دکمه نمایش/مخفی کردن رمز عبور
                 MDIconButton:
                     id: password_visibility_btn
                     icon: "eye-off"
                     pos_hint: {"center_y": 0.5}
                     on_release: root.toggle_password_visibility()
 
+            # دکمه ورود
             MDButton:
                 style: "filled"
                 size_hint_x: 1
@@ -107,7 +115,7 @@ Builder.load_string(
                     text: "Login"
                     font_style: "Title"
 
-        # Error message
+        # پیام خطا
         MDLabel:
             id: error_label
             text: ""
@@ -117,10 +125,10 @@ Builder.load_string(
             size_hint_y: None
             height: dp(40)
 
-        # Spacer
+        # فضای خالی
         Widget:
 
-        # Register link
+        # لینک ثبت‌نام برای کاربران جدید
         MDBoxLayout:
             size_hint_y: None
             height: dp(50)
@@ -145,29 +153,34 @@ Builder.load_string(
 )
 
 
+# کلاس صفحه ورود برای احراز هویت کاربران
 class LoginScreen(MDScreen):
-    """Login screen for user authentication"""
+    """صفحه ورود برای احراز هویت کاربران"""
 
+    # اجرای انیمیشن کارت هنگام نمایش صفحه
     def on_enter(self):
-        """Animate card when screen is shown"""
+        """انیمیشن کارت هنگام نمایش صفحه"""
         self.ids.error_label.text = ""
         Clock.schedule_once(self._animate_card, 0.1)
 
+    # انیمیشن ورودی کارت لاگین
     def _animate_card(self, dt):
-        """Animate login card entrance"""
+        """انیمیشن ورودی کارت لاگین"""
         card = self.ids.login_card
         Animation(opacity=1, duration=0.4).start(card)
 
+    # تغییر وضعیت نمایش رمز عبور (مخفی/آشکار)
     def toggle_password_visibility(self):
-        """Toggle password field visibility"""
+        """تغییر وضعیت نمایش رمز عبور"""
         pwd_field = self.ids.password_field
         btn = self.ids.password_visibility_btn
 
         pwd_field.password = not pwd_field.password
         btn.icon = "eye" if not pwd_field.password else "eye-off"
 
+    # انجام عملیات ورود و بررسی اطلاعات کاربر
     def do_login(self):
-        """Perform login"""
+        """انجام عملیات ورود"""
         from kivymd.app import MDApp
         from database import DatabaseManager
         from utils.helpers import verify_password
@@ -178,27 +191,28 @@ class LoginScreen(MDScreen):
         email = self.ids.email_field.text.strip()
         password = self.ids.password_field.text
 
-        # Validate input
+        # اعتبارسنجی ورودی‌ها
         if not email or not password:
             self.ids.error_label.text = "Please fill in all fields"
             return
 
-        # Get user from database
+        # جستجوی کاربر در دیتابیس
         user = db.get_user_by_email(email)
 
         if not user:
             self.ids.error_label.text = "User not found"
             return
 
+        # بررسی صحت رمز عبور
         if not verify_password(password, user.password_hash):
             self.ids.error_label.text = "Invalid password"
             return
 
-        # Login successful
+        # ورود موفقیت‌آمیز - ذخیره کاربر و انتقال به صفحه اصلی
         app.current_user = user
         app.switch_screen("main")
 
-        # Clear fields
+        # پاک کردن فیلدها
         self.ids.email_field.text = ""
         self.ids.password_field.text = ""
         self.ids.error_label.text = ""

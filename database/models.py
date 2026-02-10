@@ -1,14 +1,16 @@
 """
-Data models for Job Finder application
+مدل‌های داده برنامه جاب فایندر
+شامل مدل‌های کاربر، شغل و تبلیغات
 """
 
 from dataclasses import dataclass, field
 from typing import Optional
 
 
+# مدل کاربر - نگهداری اطلاعات کاربران ثبت‌نام شده
 @dataclass
 class User:
-    """User model"""
+    """مدل کاربر"""
 
     id: Optional[int] = None
     name: str = ""
@@ -19,6 +21,7 @@ class User:
     resume_path: Optional[str] = None
     created_at: Optional[str] = None
 
+    # تبدیل اطلاعات کاربر به دیکشنری برای استفاده در API یا نمایش
     def to_dict(self) -> dict:
         return {
             "id": self.id,
@@ -31,9 +34,10 @@ class User:
         }
 
 
+# مدل شغل - نگهداری اطلاعات آگهی‌های شغلی
 @dataclass
 class Job:
-    """Job listing model"""
+    """مدل آگهی شغلی"""
 
     id: Optional[int] = None
     title: str = ""
@@ -44,6 +48,7 @@ class Job:
     description: str = ""
     created_at: Optional[str] = None
 
+    # تبدیل اطلاعات شغل به دیکشنری
     def to_dict(self) -> dict:
         return {
             "id": self.id,
@@ -57,19 +62,21 @@ class Job:
         }
 
 
+# مدل تبلیغات - نگهداری اطلاعات بنرهای تبلیغاتی با وزن نمایش
 @dataclass
 class Advertisement:
-    """Advertisement model"""
+    """مدل تبلیغات"""
 
     id: Optional[int] = None
     title: str = ""
     description: str = ""
     company: str = ""
-    payment_weight: int = 1  # Higher = more frequent display
+    payment_weight: int = 1  # وزن نمایش - هرچه بیشتر باشد بیشتر نمایش داده می‌شود
     icon: str = "bullhorn"
     active: bool = True
     created_at: Optional[str] = None
 
+    # تبدیل اطلاعات تبلیغ به دیکشنری
     def to_dict(self) -> dict:
         return {
             "id": self.id,

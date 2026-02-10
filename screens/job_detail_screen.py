@@ -1,5 +1,5 @@
 """
-Job Detail Screen - Displays full job information
+صفحه جزئیات شغل - نمایش اطلاعات کامل آگهی شغلی
 """
 
 from kivy.lang import Builder
@@ -8,6 +8,7 @@ from kivy.clock import Clock
 from kivymd.uix.screen import MDScreen
 
 
+# بارگذاری رابط کاربری صفحه جزئیات شغل با زبان KV
 Builder.load_string(
     """
 <JobDetailScreen>:
@@ -17,7 +18,7 @@ Builder.load_string(
         orientation: "vertical"
         md_bg_color: app.theme_cls.backgroundColor
 
-        # Top bar
+        # نوار بالای صفحه شامل دکمه برگشت و عنوان
         MDBoxLayout:
             size_hint_y: None
             height: dp(56)
@@ -34,7 +35,7 @@ Builder.load_string(
                 role: "small"
                 valign: "center"
 
-        # Scrollable content
+        # محتوای قابل اسکرول
         MDScrollView:
             do_scroll_x: False
 
@@ -45,7 +46,7 @@ Builder.load_string(
                 padding: dp(16)
                 spacing: dp(16)
 
-                # Job header card
+                # کارت سربرگ شغل شامل عنوان، شرکت، کشور و دسته‌بندی
                 MDCard:
                     id: header_card
                     orientation: "vertical"
@@ -78,6 +79,7 @@ Builder.load_string(
                         role: "medium"
                         theme_text_color: "Secondary"
 
+                    # ردیف کشور و دسته‌بندی
                     MDBoxLayout:
                         size_hint_y: None
                         height: dp(30)
@@ -85,6 +87,7 @@ Builder.load_string(
 
                         Widget:
 
+                        # کشور
                         MDBoxLayout:
                             size_hint_x: None
                             width: self.minimum_width
@@ -102,6 +105,7 @@ Builder.load_string(
                                 text: "Country"
                                 adaptive_width: True
 
+                        # دسته‌بندی
                         MDBoxLayout:
                             size_hint_x: None
                             width: self.minimum_width
@@ -121,7 +125,7 @@ Builder.load_string(
 
                         Widget:
 
-                # Salary card
+                # کارت حقوق و دستمزد
                 MDCard:
                     id: salary_card
                     orientation: "vertical"
@@ -157,7 +161,7 @@ Builder.load_string(
                                 font_style: "Headline"
                                 role: "small"
 
-                # Description card
+                # کارت توضیحات شغل
                 MDCard:
                     id: desc_card
                     orientation: "vertical"
@@ -189,7 +193,7 @@ Builder.load_string(
                         height: self.texture_size[1]
                         text_size: self.width, None
 
-                # Apply button
+                # دکمه ارسال درخواست شغلی
                 MDButton:
                     id: apply_btn
                     style: "filled"
@@ -205,7 +209,7 @@ Builder.load_string(
                         text: "Apply Now"
                         font_style: "Title"
 
-                # Bottom padding
+                # فضای خالی پایین
                 Widget:
                     size_hint_y: None
                     height: dp(20)
@@ -213,11 +217,13 @@ Builder.load_string(
 )
 
 
+# کلاس صفحه جزئیات شغل - نمایش اطلاعات کامل آگهی
 class JobDetailScreen(MDScreen):
-    """Screen showing detailed job information"""
+    """صفحه نمایش اطلاعات کامل آگهی شغلی"""
 
+    # پر کردن اطلاعات شغل هنگام ورود به صفحه
     def on_enter(self):
-        """Populate job details when entering screen"""
+        """پر کردن جزئیات شغل هنگام ورود به صفحه"""
         from kivymd.app import MDApp
         from utils.helpers import format_salary
 
@@ -232,11 +238,12 @@ class JobDetailScreen(MDScreen):
             self.ids.job_salary.text = format_salary(job.salary)
             self.ids.job_description.text = job.description
 
-        # Animate cards
+        # اجرای انیمیشن کارت‌ها
         Clock.schedule_once(self._animate_cards, 0.1)
 
+    # انیمیشن ورودی کارت‌ها به ترتیب
     def _animate_cards(self, dt):
-        """Animate cards entrance"""
+        """انیمیشن ورودی کارت‌ها"""
         cards = [
             self.ids.header_card,
             self.ids.salary_card,
@@ -249,8 +256,9 @@ class JobDetailScreen(MDScreen):
                 lambda dt, c=card: Animation(opacity=1, duration=0.3).start(c), i * 0.1
             )
 
+    # مدیریت ارسال درخواست شغلی و نمایش دیالوگ تایید
     def apply_for_job(self):
-        """Handle job application"""
+        """مدیریت ارسال درخواست شغلی"""
         from kivymd.app import MDApp
         from kivymd.uix.dialog import (
             MDDialog,
@@ -263,10 +271,12 @@ class JobDetailScreen(MDScreen):
         app = MDApp.get_running_app()
         job = app.selected_job
 
+        # ساخت پیام تایید ارسال درخواست
         message = (
             f"Your application for '{job.title}' at {job.company} has been submitted!"
         )
 
+        # بررسی وجود رزومه کاربر و نمایش پیام مناسب
         if app.current_user and app.current_user.resume_path:
             message += "\n\nYour resume has been attached to the application."
         else:
@@ -274,6 +284,7 @@ class JobDetailScreen(MDScreen):
                 "\n\nTip: Upload a resume in your profile to improve your chances!"
             )
 
+        # ساخت و نمایش دیالوگ تایید ارسال درخواست
         dialog = MDDialog(
             MDDialogHeadlineText(text="Application Submitted!"),
             MDDialogSupportingText(text=message),

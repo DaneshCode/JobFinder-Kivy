@@ -1,5 +1,5 @@
 """
-Register Screen - User registration
+صفحه ثبت‌نام - ایجاد حساب کاربری جدید
 """
 
 from kivy.lang import Builder
@@ -8,6 +8,7 @@ from kivy.clock import Clock
 from kivymd.uix.screen import MDScreen
 
 
+# بارگذاری رابط کاربری صفحه ثبت‌نام با زبان KV
 Builder.load_string(
     """
 <RegisterScreen>:
@@ -19,7 +20,7 @@ Builder.load_string(
         padding: dp(20)
         spacing: dp(10)
 
-        # Top bar
+        # نوار بالای صفحه شامل دکمه برگشت و عنوان
         MDBoxLayout:
             size_hint_y: None
             height: dp(56)
@@ -35,7 +36,7 @@ Builder.load_string(
                 role: "small"
                 valign: "center"
 
-        # Scrollable content
+        # محتوای قابل اسکرول
         MDScrollView:
             do_scroll_x: False
 
@@ -46,7 +47,7 @@ Builder.load_string(
                 padding: dp(0), dp(20)
                 spacing: dp(20)
 
-                # Register card
+                # کارت ثبت‌نام شامل فرم اطلاعات کاربر
                 MDCard:
                     id: register_card
                     orientation: "vertical"
@@ -57,6 +58,7 @@ Builder.load_string(
                     style: "elevated"
                     opacity: 0
 
+                    # آیکون ثبت‌نام
                     MDIcon:
                         icon: "account-plus"
                         halign: "center"
@@ -64,12 +66,14 @@ Builder.load_string(
                         theme_text_color: "Custom"
                         text_color: app.theme_cls.primaryColor
 
+                    # عنوان صفحه ثبت‌نام
                     MDLabel:
                         text: "Join Job Finder"
                         halign: "center"
                         font_style: "Headline"
                         role: "small"
 
+                    # فیلد نام کامل
                     MDTextField:
                         id: name_field
                         mode: "outlined"
@@ -81,6 +85,7 @@ Builder.load_string(
                         MDTextFieldHintText:
                             text: "Full Name"
 
+                    # فیلد ایمیل
                     MDTextField:
                         id: email_field
                         mode: "outlined"
@@ -92,6 +97,7 @@ Builder.load_string(
                         MDTextFieldHintText:
                             text: "Email"
 
+                    # فیلد رمز عبور
                     MDTextField:
                         id: password_field
                         mode: "outlined"
@@ -104,6 +110,7 @@ Builder.load_string(
                         MDTextFieldHintText:
                             text: "Password"
 
+                    # فیلد تکرار رمز عبور
                     MDTextField:
                         id: confirm_password_field
                         mode: "outlined"
@@ -116,6 +123,7 @@ Builder.load_string(
                         MDTextFieldHintText:
                             text: "Confirm Password"
 
+                    # فیلد تخصص شغلی
                     MDTextField:
                         id: specialty_field
                         mode: "outlined"
@@ -127,6 +135,7 @@ Builder.load_string(
                         MDTextFieldHintText:
                             text: "Job Specialty (e.g., Python Developer)"
 
+                    # دکمه ساخت حساب کاربری
                     MDButton:
                         style: "filled"
                         size_hint_x: 1
@@ -137,7 +146,7 @@ Builder.load_string(
                             text: "Create Account"
                             font_style: "Title"
 
-                # Error/Success message
+                # پیام خطا یا موفقیت
                 MDLabel:
                     id: message_label
                     text: ""
@@ -145,7 +154,7 @@ Builder.load_string(
                     size_hint_y: None
                     height: dp(40)
 
-                # Login link
+                # لینک ورود برای کاربرانی که قبلا حساب دارند
                 MDBoxLayout:
                     size_hint_y: None
                     height: dp(50)
@@ -167,7 +176,7 @@ Builder.load_string(
 
                     Widget:
 
-                # Bottom padding
+                # فضای خالی پایین
                 Widget:
                     size_hint_y: None
                     height: dp(20)
@@ -175,29 +184,34 @@ Builder.load_string(
 )
 
 
+# کلاس صفحه ثبت‌نام برای ایجاد حساب کاربری جدید
 class RegisterScreen(MDScreen):
-    """Registration screen for new users"""
+    """صفحه ثبت‌نام برای کاربران جدید"""
 
+    # اجرای انیمیشن کارت هنگام نمایش صفحه
     def on_enter(self):
-        """Animate card when screen is shown"""
+        """انیمیشن کارت هنگام نمایش صفحه"""
         self.ids.message_label.text = ""
         self.ids.message_label.theme_text_color = "Primary"
         Clock.schedule_once(self._animate_card, 0.1)
 
+    # انیمیشن ورودی کارت ثبت‌نام
     def _animate_card(self, dt):
-        """Animate register card entrance"""
+        """انیمیشن ورودی کارت ثبت‌نام"""
         card = self.ids.register_card
         Animation(opacity=1, duration=0.4).start(card)
 
+    # نمایش پیام به کاربر (خطا یا موفقیت)
     def show_message(self, text, is_error=True):
-        """Show message to user"""
+        """نمایش پیام به کاربر"""
         label = self.ids.message_label
         label.text = text
         label.theme_text_color = "Custom"
         label.text_color = "red" if is_error else "green"
 
+    # انجام عملیات ثبت‌نام و ذخیره اطلاعات کاربر در دیتابیس
     def do_register(self):
-        """Perform registration"""
+        """انجام عملیات ثبت‌نام"""
         from kivymd.app import MDApp
         from database import DatabaseManager
         from utils.helpers import (
@@ -216,30 +230,33 @@ class RegisterScreen(MDScreen):
         confirm_password = self.ids.confirm_password_field.text
         specialty = self.ids.specialty_field.text.strip()
 
-        # Validate input
+        # اعتبارسنجی ورودی‌ها - بررسی پر بودن تمام فیلدها
         if not all([name, email, password, confirm_password, specialty]):
             self.show_message("Please fill in all fields")
             return
 
+        # بررسی صحت فرمت ایمیل
         if not validate_email(email):
             self.show_message("Please enter a valid email")
             return
 
+        # بررسی قدرت رمز عبور
         is_valid, msg = validate_password(password)
         if not is_valid:
             self.show_message(msg)
             return
 
+        # بررسی تطابق رمز عبور و تکرار آن
         if password != confirm_password:
             self.show_message("Passwords do not match")
             return
 
-        # Check if user exists
+        # بررسی تکراری نبودن ایمیل
         if db.get_user_by_email(email):
             self.show_message("Email already registered")
             return
 
-        # Generate user code and create user
+        # تولید کد کاربری و ساخت حساب کاربری
         user_code = generate_user_code()
         password_hash = hash_password(password)
 
@@ -255,14 +272,14 @@ class RegisterScreen(MDScreen):
             self.show_message(
                 f"Account created! Your code: {user_code}", is_error=False
             )
-            # Clear fields
+            # پاک کردن فیلدها
             self.ids.name_field.text = ""
             self.ids.email_field.text = ""
             self.ids.password_field.text = ""
             self.ids.confirm_password_field.text = ""
             self.ids.specialty_field.text = ""
 
-            # Switch to login after delay
+            # انتقال به صفحه ورود بعد از ۲ ثانیه
             Clock.schedule_once(lambda dt: app.switch_screen("login"), 2)
         else:
             self.show_message("Registration failed. Please try again.")
