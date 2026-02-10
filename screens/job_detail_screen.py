@@ -100,8 +100,7 @@ Builder.load_string(
                             MDLabel:
                                 id: job_country
                                 text: "Country"
-                                size_hint_x: None
-                                width: self.texture_size[0]
+                                adaptive_width: True
 
                         MDBoxLayout:
                             size_hint_x: None
@@ -118,8 +117,7 @@ Builder.load_string(
                             MDLabel:
                                 id: job_category
                                 text: "Category"
-                                size_hint_x: None
-                                width: self.texture_size[0]
+                                adaptive_width: True
 
                         Widget:
 
