@@ -130,8 +130,7 @@ Builder.load_string(
 
             MDLabel:
                 text: "Don't have an account?"
-                size_hint_x: None
-                width: self.texture_size[0]
+                adaptive_width: True
                 theme_text_color: "Secondary"
 
             MDButton:

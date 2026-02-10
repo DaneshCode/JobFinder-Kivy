@@ -155,8 +155,7 @@ Builder.load_string(
 
                     MDLabel:
                         text: "Already have an account?"
-                        size_hint_x: None
-                        width: self.texture_size[0]
+                        adaptive_width: True
                         theme_text_color: "Secondary"
 
                     MDButton:
