@@ -1,63 +1,71 @@
 """
-Database Manager for Job Finder application
-Handles all database operations using SQLite
+مدیریت پایگاه داده برنامه Job Finder
+این ماژول تمام عملیات پایگاه داده را با استفاده از SQLite انجام می‌دهد
 """
 
+# وارد کردن کتابخانه‌های مورد نیاز
 import sqlite3
 import os
 from datetime import datetime
 from typing import List, Optional
 import random
 
+# وارد کردن مدل‌های داده
 from .models import User, Job, Advertisement
 
 
 class DatabaseManager:
-    """Singleton Database Manager"""
+    """کلاس مدیریت پایگاه داده - از الگوی Singleton استفاده می‌کند"""
 
+    # متغیر برای نگهداری تنها نمونه از کلاس
     _instance = None
 
     def __new__(cls):
+        """ایجاد نمونه جدید فقط اگر قبلاً ایجاد نشده باشد (الگوی Singleton)"""
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._instance._initialized = False
         return cls._instance
 
     def __init__(self):
+        """مقداردهی اولیه - فقط یکبار اجرا می‌شود"""
         if self._initialized:
             return
 
-        # Get app data directory
+        # دریافت مسیر پایگاه داده
         self.db_path = self._get_db_path()
         self.conn = None
         self._initialized = True
+        # ایجاد جداول پایگاه داده
         self.initialize_database()
 
     def _get_db_path(self):
-        """Get the database path based on platform"""
+        """تعیین مسیر فایل پایگاه داده بر اساس پلتفرم (اندروید یا دسکتاپ)"""
         try:
+            # تلاش برای اجرا روی اندروید
             from android.storage import app_storage_path  # type: ignore[import-not-found]
 
             return os.path.join(app_storage_path(), "jobfinder.db")
         except ImportError:
-            # Running on desktop
+            # اجرا روی دسکتاپ - ذخیره در پوشه data
             data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
             os.makedirs(data_dir, exist_ok=True)
             return os.path.join(data_dir, "jobfinder.db")
 
     def get_connection(self):
-        """Get database connection"""
+        """دریافت اتصال به پایگاه داده - در صورت نیاز اتصال جدید ایجاد می‌کند"""
         if self.conn is None:
             self.conn = sqlite3.connect(self.db_path, check_same_thread=False)
+            # تنظیم برای دسترسی به ستون‌ها با نام
             self.conn.row_factory = sqlite3.Row
         return self.conn
 
     def initialize_database(self):
-        """Create database tables if they don't exist"""
+        """ایجاد جداول پایگاه داده در صورت عدم وجود"""
         conn = self.get_connection()
         cursor = conn.cursor()
 
-        # Users table
+        # جدول کاربران - ذخیره اطلاعات کاربران ثبت‌نام شده
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS users (
@@ -73,7 +81,7 @@ class DatabaseManager:
         """
         )
 
-        # Jobs table
+        # جدول مشاغل - ذخیره آگهی‌های شغلی
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS jobs (
@@ -89,7 +97,7 @@ class DatabaseManager:
         """
         )
 
-        # Advertisements table
+        # جدول تبلیغات - ذخیره تبلیغات نمایشی
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS advertisements (
@@ -105,35 +113,36 @@ class DatabaseManager:
         """
         )
 
-        # Create indexes for faster search
+        # ایجاد ایندکس‌ها برای جستجوی سریع‌تر
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_jobs_category ON jobs(category)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_jobs_title ON jobs(title)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_jobs_country ON jobs(country)")
 
         conn.commit()
 
-        # Seed initial data if tables are empty
+        # درج داده‌های اولیه اگر جداول خالی هستند
         self._seed_initial_data()
 
     def _seed_initial_data(self):
-        """Seed initial jobs and advertisements"""
+        """درج داده‌های نمونه اولیه در صورت خالی بودن جداول"""
         conn = self.get_connection()
         cursor = conn.cursor()
 
-        # Check if jobs exist
+        # بررسی وجود مشاغل
         cursor.execute("SELECT COUNT(*) FROM jobs")
         if cursor.fetchone()[0] == 0:
             self._seed_jobs()
 
-        # Check if ads exist
+        # بررسی وجود تبلیغات
         cursor.execute("SELECT COUNT(*) FROM advertisements")
         if cursor.fetchone()[0] == 0:
             self._seed_advertisements()
 
     def _seed_jobs(self):
-        """Seed sample job listings"""
+        """درج مشاغل نمونه در پایگاه داده"""
+        # لیست مشاغل نمونه با دسته‌بندی‌های مختلف
         jobs = [
-            # ============ Computer Engineering ============
+            # ============ مهندسی کامپیوتر ============
             (
                 "Senior Python Developer",
                 "Computer Engineering",
@@ -150,7 +159,7 @@ class DatabaseManager:
                 85000,
                 "Work on both frontend and backend using Node.js, React, and PostgreSQL in a fast-paced startup environment.",
             ),
-            # ============ Architecture ============
+            # ============ معماری ============
             (
                 "Senior Architect",
                 "Architecture",
@@ -167,7 +176,7 @@ class DatabaseManager:
                 55000,
                 "Create innovative interior designs for luxury homes and commercial spaces.",
             ),
-            # ============ Civil Engineering ============
+            # ============ مهندسی عمران ============
             (
                 "Structural Engineer",
                 "Civil Engineering",
@@ -184,7 +193,7 @@ class DatabaseManager:
                 92000,
                 "Oversee construction projects ensuring quality, safety, and budget compliance.",
             ),
-            # ============ Accounting ============
+            # ============ حسابداری ============
             (
                 "Senior Accountant",
                 "Accounting",
@@ -201,7 +210,7 @@ class DatabaseManager:
                 82000,
                 "Provide tax planning and compliance services for corporate clients.",
             ),
-            # ============ Electrical Engineering ============
+            # ============ مهندسی برق ============
             (
                 "Power Systems Engineer",
                 "Electrical Engineering",
@@ -218,7 +227,7 @@ class DatabaseManager:
                 78000,
                 "Design electronic circuits and components for consumer products.",
             ),
-            # ============ Mechanical Engineering ============
+            # ============ مهندسی مکانیک ============
             (
                 "HVAC Engineer",
                 "Mechanical Engineering",
@@ -235,7 +244,7 @@ class DatabaseManager:
                 88000,
                 "Design and develop automotive components and systems.",
             ),
-            # ============ Healthcare ============
+            # ============ بهداشت و درمان ============
             (
                 "Registered Nurse",
                 "Healthcare",
@@ -252,7 +261,7 @@ class DatabaseManager:
                 98000,
                 "Dispense medications and provide pharmaceutical consultation.",
             ),
-            # ============ Law ============
+            # ============ حقوق ============
             (
                 "Corporate Lawyer",
                 "Law",
@@ -269,7 +278,7 @@ class DatabaseManager:
                 88000,
                 "Assist clients with immigration applications and legal issues.",
             ),
-            # ============ Marketing ============
+            # ============ بازاریابی ============
             (
                 "Digital Marketing Manager",
                 "Marketing",
@@ -286,7 +295,7 @@ class DatabaseManager:
                 62000,
                 "Optimize website content for search engine visibility.",
             ),
-            # ============ Education ============
+            # ============ آموزش ============
             (
                 "University Professor",
                 "Education",
@@ -308,6 +317,7 @@ class DatabaseManager:
         conn = self.get_connection()
         cursor = conn.cursor()
 
+        # درج هر شغل در پایگاه داده
         for job in jobs:
             cursor.execute(
                 """
@@ -320,7 +330,8 @@ class DatabaseManager:
         conn.commit()
 
     def _seed_advertisements(self):
-        """Seed sample advertisements"""
+        """درج تبلیغات نمونه در پایگاه داده"""
+        # لیست تبلیغات نمونه
         ads = [
             (
                 "Learn Python Today!",
@@ -383,6 +394,7 @@ class DatabaseManager:
         conn = self.get_connection()
         cursor = conn.cursor()
 
+        # درج هر تبلیغ در پایگاه داده
         for ad in ads:
             cursor.execute(
                 """
@@ -394,11 +406,12 @@ class DatabaseManager:
 
         conn.commit()
 
-    # User operations
+    # ==================== عملیات مربوط به کاربران ====================
+
     def create_user(
         self, name: str, email: str, password_hash: str, specialty: str, user_code: str
     ) -> Optional[int]:
-        """Create a new user"""
+        """ایجاد کاربر جدید در پایگاه داده - در صورت موفقیت شناسه کاربر را برمی‌گرداند"""
         try:
             conn = self.get_connection()
             cursor = conn.cursor()
@@ -412,15 +425,17 @@ class DatabaseManager:
             conn.commit()
             return cursor.lastrowid
         except sqlite3.IntegrityError:
+            # ایمیل یا کد کاربری تکراری است
             return None
 
     def get_user_by_email(self, email: str) -> Optional[User]:
-        """Get user by email"""
+        """دریافت کاربر بر اساس ایمیل"""
         conn = self.get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
         row = cursor.fetchone()
         if row:
+            # تبدیل ردیف پایگاه داده به شیء User
             return User(
                 id=row["id"],
                 name=row["name"],
@@ -434,12 +449,13 @@ class DatabaseManager:
         return None
 
     def get_user_by_id(self, user_id: int) -> Optional[User]:
-        """Get user by ID"""
+        """دریافت کاربر بر اساس شناسه"""
         conn = self.get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
         row = cursor.fetchone()
         if row:
+            # تبدیل ردیف پایگاه داده به شیء User
             return User(
                 id=row["id"],
                 name=row["name"],
@@ -453,7 +469,7 @@ class DatabaseManager:
         return None
 
     def update_user_resume(self, user_id: int, resume_path: str) -> bool:
-        """Update user's resume path"""
+        """به‌روزرسانی مسیر رزومه کاربر"""
         try:
             conn = self.get_connection()
             cursor = conn.cursor()
@@ -469,7 +485,7 @@ class DatabaseManager:
             return False
 
     def update_user_profile(self, user_id: int, name: str, specialty: str) -> bool:
-        """Update user profile"""
+        """به‌روزرسانی پروفایل کاربر (نام و تخصص)"""
         try:
             conn = self.get_connection()
             cursor = conn.cursor()
@@ -484,33 +500,37 @@ class DatabaseManager:
         except Exception:
             return False
 
-    # Job operations
+    # ==================== عملیات مربوط به مشاغل ====================
+
     def get_jobs_count(self) -> int:
-        """Get total number of jobs (fast count)"""
+        """دریافت تعداد کل مشاغل (کوئری سریع)"""
         conn = self.get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM jobs")
         return cursor.fetchone()[0]
 
     def get_countries_count(self) -> int:
-        """Get total number of unique countries (fast count)"""
+        """دریافت تعداد کشورهای یکتا (کوئری سریع)"""
         conn = self.get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(DISTINCT country) FROM jobs")
         return cursor.fetchone()[0]
 
     def get_all_jobs(self, limit: int = 0, offset: int = 0) -> List[Job]:
-        """Get all jobs with optional pagination"""
+        """دریافت همه مشاغل با امکان صفحه‌بندی"""
         conn = self.get_connection()
         cursor = conn.cursor()
         if limit > 0:
+            # با محدودیت تعداد
             cursor.execute(
                 "SELECT * FROM jobs ORDER BY created_at DESC LIMIT ? OFFSET ?",
                 (limit, offset),
             )
         else:
+            # همه مشاغل
             cursor.execute("SELECT * FROM jobs ORDER BY created_at DESC")
         rows = cursor.fetchall()
+        # تبدیل ردیف‌ها به لیست اشیاء Job
         return [
             Job(
                 id=row["id"],
@@ -526,9 +546,10 @@ class DatabaseManager:
         ]
 
     def search_jobs(self, keyword: str) -> List[Job]:
-        """Search jobs by keyword"""
+        """جستجوی مشاغل بر اساس کلمه کلیدی"""
         conn = self.get_connection()
         cursor = conn.cursor()
+        # جستجو در همه فیلدهای متنی
         search_term = f"%{keyword}%"
         cursor.execute(
             """
@@ -555,7 +576,7 @@ class DatabaseManager:
         ]
 
     def get_job_by_id(self, job_id: int) -> Optional[Job]:
-        """Get job by ID"""
+        """دریافت شغل بر اساس شناسه"""
         conn = self.get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM jobs WHERE id = ?", (job_id,))
@@ -574,7 +595,7 @@ class DatabaseManager:
         return None
 
     def get_all_categories(self) -> List[str]:
-        """Get all unique job categories"""
+        """دریافت لیست همه دسته‌بندی‌های یکتا"""
         conn = self.get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT DISTINCT category FROM jobs ORDER BY category")
@@ -582,7 +603,7 @@ class DatabaseManager:
         return [row["category"] for row in rows]
 
     def get_jobs_by_category(self, category: str) -> List[Job]:
-        """Get jobs filtered by category"""
+        """دریافت مشاغل فیلتر شده بر اساس دسته‌بندی"""
         conn = self.get_connection()
         cursor = conn.cursor()
         cursor.execute(
@@ -607,12 +628,13 @@ class DatabaseManager:
     def search_jobs_with_category(
         self, keyword: str, category: str = None
     ) -> List[Job]:
-        """Search jobs by keyword with optional category filter"""
+        """جستجوی مشاغل با کلمه کلیدی و فیلتر دسته‌بندی اختیاری"""
         conn = self.get_connection()
         cursor = conn.cursor()
         search_term = f"%{keyword}%"
 
         if category and category != "All":
+            # جستجو با فیلتر دسته‌بندی
             cursor.execute(
                 """
                 SELECT * FROM jobs
@@ -622,6 +644,7 @@ class DatabaseManager:
                 (category, search_term, search_term, search_term, search_term),
             )
         else:
+            # جستجو در همه دسته‌بندی‌ها
             cursor.execute(
                 """
                 SELECT * FROM jobs
@@ -647,9 +670,10 @@ class DatabaseManager:
             for row in rows
         ]
 
-    # Advertisement operations
+    # ==================== عملیات مربوط به تبلیغات ====================
+
     def get_active_advertisements(self) -> List[Advertisement]:
-        """Get all active advertisements"""
+        """دریافت همه تبلیغات فعال"""
         conn = self.get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM advertisements WHERE active = 1")
@@ -669,12 +693,12 @@ class DatabaseManager:
         ]
 
     def get_weighted_random_ad(self) -> Optional[Advertisement]:
-        """Get a random advertisement weighted by payment"""
+        """دریافت یک تبلیغ تصادفی با وزن‌دهی بر اساس پرداخت"""
         ads = self.get_active_advertisements()
         if not ads:
             return None
 
-        # Create weighted list
+        # ایجاد لیست وزن‌دار - تبلیغات با وزن بیشتر، شانس بیشتری دارند
         weighted_ads = []
         for ad in ads:
             weighted_ads.extend([ad] * ad.payment_weight)
@@ -682,7 +706,7 @@ class DatabaseManager:
         return random.choice(weighted_ads)
 
     def close(self):
-        """Close database connection"""
+        """بستن اتصال به پایگاه داده"""
         if self.conn:
             self.conn.close()
             self.conn = None

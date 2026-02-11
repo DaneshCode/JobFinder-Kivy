@@ -1,9 +1,12 @@
 """
-Main Screen - Main application area after login with bottom navigation
+صفحه اصلی - بخش اصلی برنامه بعد از ورود با نوار ناوبری پایین
 """
 
+# وارد کردن کتابخانه‌های کیوی
 from kivy.lang import Builder
 from kivy.properties import StringProperty
+
+# وارد کردن کامپوننت‌های KivyMD
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.navigationbar import (
     MDNavigationBar,
@@ -13,6 +16,7 @@ from kivymd.uix.navigationbar import (
 )
 
 
+# تعریف رابط کاربری با زبان KV
 Builder.load_string(
     """
 <MainScreen>:
@@ -22,11 +26,11 @@ Builder.load_string(
         orientation: "vertical"
         md_bg_color: app.theme_cls.backgroundColor
 
-        # Content area
+        # بخش محتوا
         MDScreenManager:
             id: content_manager
 
-            # Home Tab
+            # تب خانه
             MDScreen:
                 name: "home_tab"
 
@@ -35,7 +39,7 @@ Builder.load_string(
                     padding: dp(16)
                     spacing: dp(16)
 
-                    # Header
+                    # هدر صفحه
                     MDBoxLayout:
                         size_hint_y: None
                         height: dp(60)
@@ -70,7 +74,7 @@ Builder.load_string(
 
                     MDDivider:
 
-                    # Quick stats cards
+                    # کارت‌های آمار سریع
                     MDBoxLayout:
                         orientation: "horizontal"
                         size_hint_y: None
@@ -113,7 +117,7 @@ Builder.load_string(
                                 font_style: "Title"
                                 role: "medium"
 
-                    # Featured jobs section
+                    # بخش مشاغل ویژه
                     MDLabel:
                         text: "Featured Jobs"
                         font_style: "Title"
@@ -121,7 +125,7 @@ Builder.load_string(
                         size_hint_y: None
                         height: dp(40)
 
-                    # Featured jobs scroll
+                    # اسکرول مشاغل ویژه
                     MDScrollView:
                         do_scroll_x: False
 
@@ -133,7 +137,7 @@ Builder.load_string(
                             spacing: dp(12)
                             padding: dp(0), dp(0), dp(0), dp(80)
 
-            # Search Tab
+            # تب جستجو
             MDScreen:
                 name: "search_tab"
 
@@ -142,7 +146,7 @@ Builder.load_string(
                     padding: dp(16)
                     spacing: dp(12)
 
-                    # Search header
+                    # هدر جستجو
                     MDLabel:
                         text: "Job Search"
                         font_style: "Headline"
@@ -150,7 +154,7 @@ Builder.load_string(
                         size_hint_y: None
                         height: dp(50)
 
-                    # Category filter chips (horizontal scroll)
+                    # چیپ‌های فیلتر دسته‌بندی (اسکرول افقی)
                     MDScrollView:
                         do_scroll_x: True
                         do_scroll_y: False
@@ -165,7 +169,7 @@ Builder.load_string(
                             spacing: dp(8)
                             padding: dp(4)
 
-                    # Search input
+                    # فیلد ورودی جستجو
                     MDTextField:
                         id: search_field
                         mode: "outlined"
@@ -179,7 +183,7 @@ Builder.load_string(
                         MDTextFieldHintText:
                             text: "Search by title, company, country..."
 
-                    # Results count
+                    # نمایش تعداد نتایج
                     MDLabel:
                         id: results_label
                         text: ""
@@ -189,7 +193,7 @@ Builder.load_string(
                         size_hint_y: None
                         height: dp(30)
 
-                    # Jobs list
+                    # لیست مشاغل
                     MDScrollView:
                         do_scroll_x: False
 
@@ -201,7 +205,7 @@ Builder.load_string(
                             spacing: dp(12)
                             padding: dp(0), dp(0), dp(0), dp(80)
 
-            # Profile Tab
+            # تب پروفایل
             MDScreen:
                 name: "profile_tab"
 
@@ -215,7 +219,7 @@ Builder.load_string(
                         padding: dp(16)
                         spacing: dp(16)
 
-                        # Profile header
+                        # هدر پروفایل
                         MDLabel:
                             text: "My Profile"
                             font_style: "Headline"
@@ -223,7 +227,7 @@ Builder.load_string(
                             size_hint_y: None
                             height: dp(50)
 
-                        # Profile card
+                        # کارت پروفایل
                         MDCard:
                             id: profile_card
                             orientation: "vertical"
@@ -287,7 +291,7 @@ Builder.load_string(
                                     id: profile_code
                                     text: "User Code"
 
-                        # Resume section
+                        # بخش رزومه
                         MDCard:
                             orientation: "vertical"
                             size_hint_y: None
@@ -331,18 +335,18 @@ Builder.load_string(
                                 MDButtonText:
                                     text: "Upload Resume (PDF)"
 
-                        # Bottom padding for ad banner
+                        # فضای خالی پایین برای بنر تبلیغاتی
                         Widget:
                             size_hint_y: None
                             height: dp(100)
 
-        # Advertisement banner placeholder
+        # محل بنر تبلیغاتی
         MDBoxLayout:
             id: ad_banner_container
             size_hint_y: None
             height: dp(80)
 
-        # Bottom navigation
+        # نوار ناوبری پایین
         MDNavigationBar:
             id: bottom_nav
             on_switch_tabs: root.on_tab_switch(*args)
@@ -382,7 +386,7 @@ Builder.load_string(
 
 
 class MainScreen(MDScreen):
-    """Main application screen with bottom navigation"""
+    """صفحه اصلی برنامه با نوار ناوبری پایین"""
 
     # فلگ‌های کنترل بارگذاری برای جلوگیری از بارگذاری مجدد بی‌مورد
     _initialized = False
@@ -394,13 +398,13 @@ class MainScreen(MDScreen):
     BATCH_SIZE = 5
 
     def on_enter(self):
-        """Initialize screen when entering - only once"""
+        """مقداردهی اولیه صفحه هنگام ورود - فقط یکبار"""
         from kivymd.app import MDApp
         from kivy.clock import Clock
 
         app = MDApp.get_running_app()
 
-        # Update welcome message
+        # به‌روزرسانی پیام خوش‌آمدگویی
         if app.current_user:
             self.ids.welcome_label.text = f"Welcome, {app.current_user.name}!"
 
@@ -427,14 +431,15 @@ class MainScreen(MDScreen):
         # بارگذاری شغل‌های ویژه به صورت دسته‌ای
         self._load_featured_jobs_async()
 
-        # بنر تبلیغاتی
+        # اضافه کردن بنر تبلیغاتی
         ad_container = self.ids.ad_banner_container
         if not ad_container.children:
             ad_banner = AdBanner()
             ad_container.add_widget(ad_banner)
 
     def on_tab_switch(self, bar, item, item_icon, item_text):
-        """Handle bottom navigation tab switch"""
+        """مدیریت تغییر تب در نوار ناوبری پایین"""
+        # نگاشت نام تب به نام صفحه
         tab_map = {"Home": "home_tab", "Search": "search_tab", "Profile": "profile_tab"}
 
         if item_text in tab_map:
@@ -456,11 +461,11 @@ class MainScreen(MDScreen):
         self.load_jobs()
 
     def load_category_chips(self):
-        """Load category filter chips - with caching"""
+        """بارگذاری چیپ‌های فیلتر دسته‌بندی - با کش"""
         from database import DatabaseManager
         from kivymd.uix.chip import MDChip, MDChipLeadingIcon, MDChipText
 
-        # کش دسته‌بندی‌ها
+        # کش دسته‌بندی‌ها برای جلوگیری از کوئری مجدد
         if self._categories_cache is None:
             db = DatabaseManager()
             self._categories_cache = ["All"] + db.get_all_categories()
@@ -468,6 +473,7 @@ class MainScreen(MDScreen):
         chips_container = self.ids.category_chips
         chips_container.clear_widgets()
 
+        # ایجاد چیپ برای هر دسته‌بندی
         for category in self._categories_cache:
             chip = MDChip(
                 MDChipLeadingIcon(
@@ -481,7 +487,7 @@ class MainScreen(MDScreen):
             chips_container.add_widget(chip)
 
     def on_category_select(self, category):
-        """Handle category selection"""
+        """مدیریت انتخاب دسته‌بندی"""
         self.selected_category = category
         # فقط وضعیت چیپ‌ها را به‌روزرسانی کن بدون ساخت مجدد
         self._update_chip_states()
@@ -510,24 +516,26 @@ class MainScreen(MDScreen):
                     break
 
     def update_profile(self):
-        """Update profile information"""
+        """به‌روزرسانی اطلاعات پروفایل کاربر"""
         from kivymd.app import MDApp
         from database import DatabaseManager
 
         app = MDApp.get_running_app()
 
         if app.current_user:
-            # Refresh user data from database
+            # بازخوانی اطلاعات کاربر از پایگاه داده
             db = DatabaseManager()
             user = db.get_user_by_id(app.current_user.id)
             if user:
                 app.current_user = user
 
+            # نمایش اطلاعات در رابط کاربری
             self.ids.profile_name.text = app.current_user.name
             self.ids.profile_email.text = app.current_user.email
             self.ids.profile_specialty.text = app.current_user.specialty
             self.ids.profile_code.text = f"Code: {app.current_user.user_code}"
 
+            # نمایش وضعیت رزومه
             if app.current_user.resume_path:
                 self.ids.resume_status.text = (
                     f"Resume: {app.current_user.resume_path.split('/')[-1]}"
@@ -536,7 +544,7 @@ class MainScreen(MDScreen):
                 self.ids.resume_status.text = "No resume uploaded"
 
     def load_jobs(self, keyword=""):
-        """Load jobs into the search list - batch loading"""
+        """بارگذاری مشاغل در لیست جستجو - بارگذاری دسته‌ای"""
         from database import DatabaseManager
 
         # لغو بارگذاری دسته‌ای قبلی
@@ -545,6 +553,7 @@ class MainScreen(MDScreen):
         db = DatabaseManager()
         category = getattr(self, "selected_category", "All")
 
+        # جستجو بر اساس کلمه کلیدی و دسته‌بندی
         if keyword or (category and category != "All"):
             jobs = db.search_jobs_with_category(keyword if keyword else "", category)
         else:
@@ -578,9 +587,11 @@ class MainScreen(MDScreen):
             return
 
         jobs_list = self.ids.jobs_list
+        # برداشتن یک دسته از مشاغل
         batch = self._pending_jobs[: self.BATCH_SIZE]
         self._pending_jobs = self._pending_jobs[self.BATCH_SIZE :]
 
+        # ایجاد کارت برای هر شغل
         for job in batch:
             card = create_job_card(job, self.show_job_detail)
             jobs_list.add_widget(card)
@@ -594,8 +605,10 @@ class MainScreen(MDScreen):
         from database import DatabaseManager
 
         db = DatabaseManager()
+        # دریافت تعداد مشاغل و کشورها
         jobs_count = db.get_jobs_count()
         countries_count = db.get_countries_count()
+        # نمایش در رابط کاربری
         self.ids.jobs_count_label.text = f"{jobs_count} Jobs"
         self.ids.countries_count_label.text = f"{countries_count} Countries"
 
@@ -605,6 +618,7 @@ class MainScreen(MDScreen):
         from kivy.clock import Clock
 
         db = DatabaseManager()
+        # دریافت 5 شغل اخیر به عنوان ویژه
         jobs = db.get_all_jobs(limit=5)
 
         featured_list = self.ids.featured_jobs_list
@@ -622,28 +636,31 @@ class MainScreen(MDScreen):
             return
 
         featured_list = self.ids.featured_jobs_list
+        # برداشتن یک دسته
         batch = self._pending_featured[: self.BATCH_SIZE]
         self._pending_featured = self._pending_featured[self.BATCH_SIZE :]
 
+        # ایجاد کارت برای هر شغل
         for job in batch:
             card = create_job_card(job, self.show_job_detail)
             featured_list.add_widget(card)
 
+        # ادامه در فریم بعدی
         if self._pending_featured:
             Clock.schedule_once(self._add_featured_batch, 0)
 
     def on_search_text(self, text):
-        """Handle search text change with debounce"""
+        """مدیریت تغییر متن جستجو با دیبانس"""
         from kivy.clock import Clock
 
-        # Debounce search - افزایش زمان دیبانس برای تایپ سریع
+        # دیبانس جستجو - افزایش زمان دیبانس برای تایپ سریع
         if hasattr(self, "_search_event") and self._search_event:
             self._search_event.cancel()
 
         self._search_event = Clock.schedule_once(lambda dt: self.load_jobs(text), 0.5)
 
     def show_job_detail(self, job):
-        """Show job detail screen"""
+        """نمایش صفحه جزئیات شغل"""
         from kivymd.app import MDApp
 
         app = MDApp.get_running_app()
@@ -651,8 +668,9 @@ class MainScreen(MDScreen):
         app.switch_screen("job_detail")
 
     def upload_resume(self):
-        """Handle resume upload"""
+        """مدیریت آپلود رزومه"""
         try:
+            # استفاده از انتخابگر فایل سیستم
             from plyer import filechooser
 
             filechooser.open_file(
@@ -660,11 +678,11 @@ class MainScreen(MDScreen):
                 on_selection=self._handle_resume_selection,
             )
         except Exception as e:
-            # Fallback for platforms without file chooser
+            # پلتفرم‌هایی که انتخابگر فایل ندارند
             self._show_upload_dialog()
 
     def _handle_resume_selection(self, selection):
-        """Handle file selection"""
+        """مدیریت انتخاب فایل رزومه"""
         if selection:
             from kivymd.app import MDApp
             from database import DatabaseManager
@@ -672,13 +690,14 @@ class MainScreen(MDScreen):
             app = MDApp.get_running_app()
             db = DatabaseManager()
 
+            # ذخیره مسیر رزومه در پایگاه داده
             file_path = selection[0]
             if db.update_user_resume(app.current_user.id, file_path):
                 app.current_user.resume_path = file_path
                 self.update_profile()
 
     def _show_upload_dialog(self):
-        """Show manual upload dialog"""
+        """نمایش دیالوگ آپلود دستی مسیر رزومه"""
         from kivymd.uix.dialog import (
             MDDialog,
             MDDialogHeadlineText,
@@ -689,16 +708,19 @@ class MainScreen(MDScreen):
         from kivymd.uix.textfield import MDTextField
         from kivymd.uix.button import MDButton, MDButtonText
 
+        # فیلد ورود مسیر
         path_field = MDTextField(
             mode="outlined",
             size_hint_x=1,
         )
 
         def save_path(*args):
+            """ذخیره مسیر وارد شده"""
             if path_field.text:
                 self._handle_resume_selection([path_field.text])
             dialog.dismiss()
 
+        # ایجاد و نمایش دیالوگ
         dialog = MDDialog(
             MDDialogHeadlineText(text="Enter Resume Path"),
             MDDialogSupportingText(text="Enter the full path to your PDF resume file:"),
@@ -717,10 +739,11 @@ class MainScreen(MDScreen):
         dialog.open()
 
     def do_logout(self):
-        """Logout and return to welcome screen"""
+        """خروج از حساب و بازگشت به صفحه خوش‌آمدگویی"""
         from kivymd.app import MDApp
 
         app = MDApp.get_running_app()
+        # پاک کردن اطلاعات کاربر فعلی
         app.current_user = None
 
         # ریست فلگ‌ها برای ورود مجدد
@@ -729,4 +752,5 @@ class MainScreen(MDScreen):
         self._categories_cache = None
         self._cancel_batch_loading()
 
+        # رفتن به صفحه خوش‌آمدگویی
         app.switch_screen("welcome")
