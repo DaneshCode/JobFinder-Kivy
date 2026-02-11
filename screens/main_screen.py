@@ -384,33 +384,54 @@ Builder.load_string(
 class MainScreen(MDScreen):
     """Main application screen with bottom navigation"""
 
+    # فلگ‌های کنترل بارگذاری برای جلوگیری از بارگذاری مجدد بی‌مورد
+    _initialized = False
+    _search_loaded = False
+    _categories_cache = None
+    _batch_event = None
+
+    # تعداد کارت‌هایی که در هر فریم اضافه می‌شوند (برای جلوگیری از فریز)
+    BATCH_SIZE = 5
+
     def on_enter(self):
-        """Initialize screen when entering"""
+        """Initialize screen when entering - only once"""
         from kivymd.app import MDApp
-        from components.ad_banner import AdBanner
+        from kivy.clock import Clock
 
         app = MDApp.get_running_app()
 
         # Update welcome message
         if app.current_user:
             self.ids.welcome_label.text = f"Welcome, {app.current_user.name}!"
-            self.update_profile()
 
-        # Initialize selected category
-        self.selected_category = "All"
+        if not self._initialized:
+            self._initialized = True
+            self.selected_category = "All"
+            self._pending_jobs = []
+            self._pending_featured = []
 
-        # Load category chips
-        self.load_category_chips()
+            # بارگذاری با تأخیر برای جلوگیری از هنگ در ورود به صفحه
+            Clock.schedule_once(self._deferred_init, 0)
+        else:
+            # فقط آمار را به‌روزرسانی کن
+            Clock.schedule_once(lambda dt: self._update_stats(), 0)
 
-        # Load jobs
-        self.load_jobs()
-        self.load_featured_jobs()
+    def _deferred_init(self, dt):
+        """بارگذاری تنبل بعد از رندر صفحه"""
+        from kivy.clock import Clock
+        from components.ad_banner import AdBanner
 
-        # Initialize ad banner
+        # بارگذاری آمار فوری (سبک)
+        self._update_stats()
+
+        # بارگذاری شغل‌های ویژه به صورت دسته‌ای
+        self._load_featured_jobs_async()
+
+        # بنر تبلیغاتی
         ad_container = self.ids.ad_banner_container
-        ad_container.clear_widgets()
-        ad_banner = AdBanner()
-        ad_container.add_widget(ad_banner)
+        if not ad_container.children:
+            ad_banner = AdBanner()
+            ad_container.add_widget(ad_banner)
 
     def on_tab_switch(self, bar, item, item_icon, item_text):
         """Handle bottom navigation tab switch"""
@@ -420,23 +441,33 @@ class MainScreen(MDScreen):
             self.ids.content_manager.current = tab_map[item_text]
 
             if item_text == "Search":
-                self.load_category_chips()
-                self.load_jobs()
+                # فقط بار اول چیپ‌ها و شغل‌ها را بارگذاری کن
+                if not self._search_loaded:
+                    self._search_loaded = True
+                    from kivy.clock import Clock
+                    Clock.schedule_once(lambda dt: self._load_search_tab(), 0)
             elif item_text == "Profile":
                 self.update_profile()
 
+    def _load_search_tab(self):
+        """بارگذاری تب جستجو به صورت تنبل"""
+        self.load_category_chips()
+        self.load_jobs()
+
     def load_category_chips(self):
-        """Load category filter chips"""
+        """Load category filter chips - with caching"""
         from database import DatabaseManager
         from kivymd.uix.chip import MDChip, MDChipLeadingIcon, MDChipText
 
-        db = DatabaseManager()
-        categories = ["All"] + db.get_all_categories()
+        # کش دسته‌بندی‌ها
+        if self._categories_cache is None:
+            db = DatabaseManager()
+            self._categories_cache = ["All"] + db.get_all_categories()
 
         chips_container = self.ids.category_chips
         chips_container.clear_widgets()
 
-        for category in categories:
+        for category in self._categories_cache:
             chip = MDChip(
                 MDChipLeadingIcon(
                     icon="check" if category == self.selected_category else "tag"
@@ -451,8 +482,29 @@ class MainScreen(MDScreen):
     def on_category_select(self, category):
         """Handle category selection"""
         self.selected_category = category
-        self.load_category_chips()  # Refresh chips to show selection
-        self.load_jobs(self.ids.search_field.text)  # Reload jobs with filter
+        # فقط وضعیت چیپ‌ها را به‌روزرسانی کن بدون ساخت مجدد
+        self._update_chip_states()
+        self.load_jobs(self.ids.search_field.text)
+
+    def _update_chip_states(self):
+        """به‌روزرسانی وضعیت چیپ‌ها بدون ساخت مجدد"""
+        chips_container = self.ids.category_chips
+        for chip in chips_container.children:
+            # استخراج نام دسته‌بندی از چیپ
+            chip_text = ""
+            for child in chip.children:
+                from kivymd.uix.chip import MDChipText
+                if isinstance(child, MDChipText):
+                    chip_text = child.text
+                    break
+            is_active = chip_text == self.selected_category
+            chip.active = is_active
+            # به‌روزرسانی آیکون
+            for child in chip.children:
+                from kivymd.uix.chip import MDChipLeadingIcon
+                if isinstance(child, MDChipLeadingIcon):
+                    child.icon = "check" if is_active else "tag"
+                    break
 
     def update_profile(self):
         """Update profile information"""
@@ -481,13 +533,13 @@ class MainScreen(MDScreen):
                 self.ids.resume_status.text = "No resume uploaded"
 
     def load_jobs(self, keyword=""):
-        """Load jobs into the search list"""
+        """Load jobs into the search list - batch loading"""
         from database import DatabaseManager
-        from components.job_card import create_job_card
+
+        # لغو بارگذاری دسته‌ای قبلی
+        self._cancel_batch_loading()
 
         db = DatabaseManager()
-
-        # Get selected category
         category = getattr(self, "selected_category", "All")
 
         if keyword or (category and category != "All"):
@@ -495,49 +547,97 @@ class MainScreen(MDScreen):
         else:
             jobs = db.get_all_jobs()
 
-        # Update results label
+        # به‌روزرسانی لیبل نتایج
         category_text = f" in {category}" if category and category != "All" else ""
         self.ids.results_label.text = f"Found {len(jobs)} jobs{category_text}"
 
-        # Clear and populate jobs list
+        # پاک کردن لیست فعلی
         jobs_list = self.ids.jobs_list
         jobs_list.clear_widgets()
 
-        for job in jobs:
+        # بارگذاری دسته‌ای برای جلوگیری از فریز UI
+        self._pending_jobs = list(jobs)
+        self._add_jobs_batch()
+
+    def _cancel_batch_loading(self):
+        """لغو بارگذاری دسته‌ای در حال انجام"""
+        if self._batch_event:
+            self._batch_event.cancel()
+            self._batch_event = None
+
+    def _add_jobs_batch(self, dt=None):
+        """اضافه کردن دسته‌ای کارت‌ها - چند کارت در هر فریم"""
+        from components.job_card import create_job_card
+        from kivy.clock import Clock
+
+        if not self._pending_jobs:
+            self._batch_event = None
+            return
+
+        jobs_list = self.ids.jobs_list
+        batch = self._pending_jobs[:self.BATCH_SIZE]
+        self._pending_jobs = self._pending_jobs[self.BATCH_SIZE:]
+
+        for job in batch:
             card = create_job_card(job, self.show_job_detail)
             jobs_list.add_widget(card)
 
-    def load_featured_jobs(self):
-        """Load featured jobs on home tab"""
+        # ادامه بارگذاری در فریم بعدی
+        if self._pending_jobs:
+            self._batch_event = Clock.schedule_once(self._add_jobs_batch, 0)
+
+    def _update_stats(self):
+        """به‌روزرسانی آمار با کوئری‌های سبک"""
         from database import DatabaseManager
-        from components.job_card import create_job_card
 
         db = DatabaseManager()
-        jobs = db.get_all_jobs()[:5]  # Top 5 jobs
+        jobs_count = db.get_jobs_count()
+        countries_count = db.get_countries_count()
+        self.ids.jobs_count_label.text = f"{jobs_count} Jobs"
+        self.ids.countries_count_label.text = f"{countries_count} Countries"
 
-        # Update stats
-        all_jobs = db.get_all_jobs()
-        countries = set(job.country for job in all_jobs)
-        self.ids.jobs_count_label.text = f"{len(all_jobs)} Jobs"
-        self.ids.countries_count_label.text = f"{len(countries)} Countries"
+    def _load_featured_jobs_async(self):
+        """بارگذاری شغل‌های ویژه به صورت دسته‌ای"""
+        from database import DatabaseManager
+        from kivy.clock import Clock
 
-        # Clear and populate featured jobs
+        db = DatabaseManager()
+        jobs = db.get_all_jobs(limit=5)
+
         featured_list = self.ids.featured_jobs_list
         featured_list.clear_widgets()
 
-        for job in jobs:
+        self._pending_featured = list(jobs)
+        self._add_featured_batch()
+
+    def _add_featured_batch(self, dt=None):
+        """اضافه کردن دسته‌ای شغل‌های ویژه"""
+        from components.job_card import create_job_card
+        from kivy.clock import Clock
+
+        if not self._pending_featured:
+            return
+
+        featured_list = self.ids.featured_jobs_list
+        batch = self._pending_featured[:self.BATCH_SIZE]
+        self._pending_featured = self._pending_featured[self.BATCH_SIZE:]
+
+        for job in batch:
             card = create_job_card(job, self.show_job_detail)
             featured_list.add_widget(card)
 
+        if self._pending_featured:
+            Clock.schedule_once(self._add_featured_batch, 0)
+
     def on_search_text(self, text):
-        """Handle search text change"""
+        """Handle search text change with debounce"""
         from kivy.clock import Clock
 
-        # Debounce search
-        if hasattr(self, "_search_event"):
+        # Debounce search - افزایش زمان دیبانس برای تایپ سریع
+        if hasattr(self, "_search_event") and self._search_event:
             self._search_event.cancel()
 
-        self._search_event = Clock.schedule_once(lambda dt: self.load_jobs(text), 0.3)
+        self._search_event = Clock.schedule_once(lambda dt: self.load_jobs(text), 0.5)
 
     def show_job_detail(self, job):
         """Show job detail screen"""
@@ -619,4 +719,11 @@ class MainScreen(MDScreen):
 
         app = MDApp.get_running_app()
         app.current_user = None
+
+        # ریست فلگ‌ها برای ورود مجدد
+        self._initialized = False
+        self._search_loaded = False
+        self._categories_cache = None
+        self._cancel_batch_loading()
+
         app.switch_screen("welcome")

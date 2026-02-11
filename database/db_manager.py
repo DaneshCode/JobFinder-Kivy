@@ -105,6 +105,17 @@ class DatabaseManager:
         """
         )
 
+        # Create indexes for faster search
+        cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_jobs_category ON jobs(category)"
+        )
+        cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_jobs_title ON jobs(title)"
+        )
+        cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_jobs_country ON jobs(country)"
+        )
+
         conn.commit()
 
         # Seed initial data if tables are empty
@@ -480,11 +491,31 @@ class DatabaseManager:
             return False
 
     # Job operations
-    def get_all_jobs(self) -> List[Job]:
-        """Get all jobs"""
+    def get_jobs_count(self) -> int:
+        """Get total number of jobs (fast count)"""
         conn = self.get_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM jobs ORDER BY created_at DESC")
+        cursor.execute("SELECT COUNT(*) FROM jobs")
+        return cursor.fetchone()[0]
+
+    def get_countries_count(self) -> int:
+        """Get total number of unique countries (fast count)"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(DISTINCT country) FROM jobs")
+        return cursor.fetchone()[0]
+
+    def get_all_jobs(self, limit: int = 0, offset: int = 0) -> List[Job]:
+        """Get all jobs with optional pagination"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        if limit > 0:
+            cursor.execute(
+                "SELECT * FROM jobs ORDER BY created_at DESC LIMIT ? OFFSET ?",
+                (limit, offset),
+            )
+        else:
+            cursor.execute("SELECT * FROM jobs ORDER BY created_at DESC")
         rows = cursor.fetchall()
         return [
             Job(
