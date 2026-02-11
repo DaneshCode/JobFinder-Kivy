@@ -445,6 +445,7 @@ class MainScreen(MDScreen):
                 if not self._search_loaded:
                     self._search_loaded = True
                     from kivy.clock import Clock
+
                     Clock.schedule_once(lambda dt: self._load_search_tab(), 0)
             elif item_text == "Profile":
                 self.update_profile()
@@ -494,6 +495,7 @@ class MainScreen(MDScreen):
             chip_text = ""
             for child in chip.children:
                 from kivymd.uix.chip import MDChipText
+
                 if isinstance(child, MDChipText):
                     chip_text = child.text
                     break
@@ -502,6 +504,7 @@ class MainScreen(MDScreen):
             # به‌روزرسانی آیکون
             for child in chip.children:
                 from kivymd.uix.chip import MDChipLeadingIcon
+
                 if isinstance(child, MDChipLeadingIcon):
                     child.icon = "check" if is_active else "tag"
                     break
@@ -575,8 +578,8 @@ class MainScreen(MDScreen):
             return
 
         jobs_list = self.ids.jobs_list
-        batch = self._pending_jobs[:self.BATCH_SIZE]
-        self._pending_jobs = self._pending_jobs[self.BATCH_SIZE:]
+        batch = self._pending_jobs[: self.BATCH_SIZE]
+        self._pending_jobs = self._pending_jobs[self.BATCH_SIZE :]
 
         for job in batch:
             card = create_job_card(job, self.show_job_detail)
@@ -619,8 +622,8 @@ class MainScreen(MDScreen):
             return
 
         featured_list = self.ids.featured_jobs_list
-        batch = self._pending_featured[:self.BATCH_SIZE]
-        self._pending_featured = self._pending_featured[self.BATCH_SIZE:]
+        batch = self._pending_featured[: self.BATCH_SIZE]
+        self._pending_featured = self._pending_featured[self.BATCH_SIZE :]
 
         for job in batch:
             card = create_job_card(job, self.show_job_detail)

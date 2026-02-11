@@ -36,7 +36,7 @@ class DatabaseManager:
     def _get_db_path(self):
         """Get the database path based on platform"""
         try:
-            from android.storage import app_storage_path
+            from android.storage import app_storage_path  # type: ignore[import-not-found]
 
             return os.path.join(app_storage_path(), "jobfinder.db")
         except ImportError:
@@ -106,15 +106,9 @@ class DatabaseManager:
         )
 
         # Create indexes for faster search
-        cursor.execute(
-            "CREATE INDEX IF NOT EXISTS idx_jobs_category ON jobs(category)"
-        )
-        cursor.execute(
-            "CREATE INDEX IF NOT EXISTS idx_jobs_title ON jobs(title)"
-        )
-        cursor.execute(
-            "CREATE INDEX IF NOT EXISTS idx_jobs_country ON jobs(country)"
-        )
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_jobs_category ON jobs(category)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_jobs_title ON jobs(title)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_jobs_country ON jobs(country)")
 
         conn.commit()
 
