@@ -1,1 +1,1 @@
-# پکیج صفحات - شامل تمام صفحات برنامه
+# Screens package - contains all application screens

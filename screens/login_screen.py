@@ -1,5 +1,5 @@
 """
-صفحه ورود - احراز هویت کاربران
+Login Screen - User authentication
 """
 
 from kivy.lang import Builder
@@ -8,7 +8,7 @@ from kivy.clock import Clock
 from kivymd.uix.screen import MDScreen
 
 
-# بارگذاری رابط کاربری صفحه ورود با زبان KV
+# Load login screen UI with KV language
 Builder.load_string(
     """
 <LoginScreen>:
@@ -20,7 +20,7 @@ Builder.load_string(
         padding: dp(20)
         spacing: dp(20)
 
-        # نوار بالای صفحه شامل دکمه برگشت و عنوان
+        # Top bar with back button and title
         MDBoxLayout:
             size_hint_y: None
             height: dp(56)
@@ -36,11 +36,11 @@ Builder.load_string(
                 role: "small"
                 valign: "center"
 
-        # فضای خالی بالا
+        # Top spacing
         Widget:
             size_hint_y: 0.05
 
-        # کارت ورود شامل فرم ایمیل و رمز عبور
+        # Login card with email and password form
         MDCard:
             id: login_card
             orientation: "vertical"
@@ -51,7 +51,7 @@ Builder.load_string(
             style: "elevated"
             opacity: 0
 
-            # آیکون کاربر
+            # User icon
             MDIcon:
                 icon: "account-circle"
                 halign: "center"
@@ -59,14 +59,14 @@ Builder.load_string(
                 theme_text_color: "Custom"
                 text_color: app.theme_cls.primaryColor
 
-            # عنوان خوش‌آمدگویی
+            # Welcome title
             MDLabel:
                 text: "Welcome Back!"
                 halign: "center"
                 font_style: "Headline"
                 role: "small"
 
-            # فیلد ایمیل
+            # Email field
             MDTextField:
                 id: email_field
                 mode: "outlined"
@@ -78,13 +78,13 @@ Builder.load_string(
                 MDTextFieldHintText:
                     text: "Email"
 
-            # ردیف فیلد رمز عبور و دکمه نمایش/مخفی کردن
+            # Password field row with show/hide button
             MDBoxLayout:
                 size_hint_y: None
                 height: dp(56)
                 spacing: dp(8)
 
-                # فیلد رمز عبور
+                # Password field
                 MDTextField:
                     id: password_field
                     mode: "outlined"
@@ -97,14 +97,14 @@ Builder.load_string(
                     MDTextFieldHintText:
                         text: "Password"
 
-                # دکمه نمایش/مخفی کردن رمز عبور
+                # Password visibility toggle button
                 MDIconButton:
                     id: password_visibility_btn
                     icon: "eye-off"
                     pos_hint: {"center_y": 0.5}
                     on_release: root.toggle_password_visibility()
 
-            # دکمه ورود
+            # Login button
             MDButton:
                 style: "filled"
                 size_hint_x: 1
@@ -115,7 +115,7 @@ Builder.load_string(
                     text: "Login"
                     font_style: "Title"
 
-        # پیام خطا
+        # Error message
         MDLabel:
             id: error_label
             text: ""
@@ -125,10 +125,10 @@ Builder.load_string(
             size_hint_y: None
             height: dp(40)
 
-        # فضای خالی
+        # Spacing
         Widget:
 
-        # لینک ثبت‌نام برای کاربران جدید
+        # Registration link for new users
         MDBoxLayout:
             size_hint_y: None
             height: dp(50)
@@ -153,34 +153,34 @@ Builder.load_string(
 )
 
 
-# کلاس صفحه ورود برای احراز هویت کاربران
+# Login screen class for user authentication
 class LoginScreen(MDScreen):
-    """صفحه ورود برای احراز هویت کاربران"""
+    """Login screen for user authentication"""
 
-    # اجرای انیمیشن کارت هنگام نمایش صفحه
+    # Run card animation when the screen is displayed
     def on_enter(self):
-        """انیمیشن کارت هنگام نمایش صفحه"""
+        """Animate card when the screen is displayed"""
         self.ids.error_label.text = ""
         Clock.schedule_once(self._animate_card, 0.1)
 
-    # انیمیشن ورودی کارت لاگین
+    # Login card entry animation
     def _animate_card(self, dt):
-        """انیمیشن ورودی کارت لاگین"""
+        """Login card entry animation"""
         card = self.ids.login_card
         Animation(opacity=1, duration=0.4).start(card)
 
-    # تغییر وضعیت نمایش رمز عبور (مخفی/آشکار)
+    # Toggle password visibility (hidden/visible)
     def toggle_password_visibility(self):
-        """تغییر وضعیت نمایش رمز عبور"""
+        """Toggle password visibility"""
         pwd_field = self.ids.password_field
         btn = self.ids.password_visibility_btn
 
         pwd_field.password = not pwd_field.password
         btn.icon = "eye" if not pwd_field.password else "eye-off"
 
-    # انجام عملیات ورود و بررسی اطلاعات کاربر
+    # Perform login operation and validate user credentials
     def do_login(self):
-        """انجام عملیات ورود"""
+        """Perform login operation"""
         from kivymd.app import MDApp
         from database import DatabaseManager
         from utils.helpers import verify_password
@@ -191,28 +191,28 @@ class LoginScreen(MDScreen):
         email = self.ids.email_field.text.strip()
         password = self.ids.password_field.text
 
-        # اعتبارسنجی ورودی‌ها
+        # Validate inputs
         if not email or not password:
             self.ids.error_label.text = "Please fill in all fields"
             return
 
-        # جستجوی کاربر در دیتابیس
+        # Search for user in database
         user = db.get_user_by_email(email)
 
         if not user:
             self.ids.error_label.text = "User not found"
             return
 
-        # بررسی صحت رمز عبور
+        # Verify password
         if not verify_password(password, user.password_hash):
             self.ids.error_label.text = "Invalid password"
             return
 
-        # ورود موفقیت‌آمیز - ذخیره کاربر و انتقال به صفحه اصلی
+        # Successful login - save user and navigate to main screen
         app.current_user = user
         app.switch_screen("main")
 
-        # پاک کردن فیلدها
+        # Clear fields
         self.ids.email_field.text = ""
         self.ids.password_field.text = ""
         self.ids.error_label.text = ""

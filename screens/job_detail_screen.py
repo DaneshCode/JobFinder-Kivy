@@ -1,5 +1,5 @@
 """
-صفحه جزئیات شغل - نمایش اطلاعات کامل آگهی شغلی
+Job Detail Screen - Display complete job listing information
 """
 
 from kivy.lang import Builder
@@ -8,7 +8,7 @@ from kivy.clock import Clock
 from kivymd.uix.screen import MDScreen
 
 
-# بارگذاری رابط کاربری صفحه جزئیات شغل با زبان KV
+# Load job detail screen UI with KV language
 Builder.load_string(
     """
 <JobDetailScreen>:
@@ -18,7 +18,7 @@ Builder.load_string(
         orientation: "vertical"
         md_bg_color: app.theme_cls.backgroundColor
 
-        # نوار بالای صفحه شامل دکمه برگشت و عنوان
+        # Top bar with back button and title
         MDBoxLayout:
             size_hint_y: None
             height: dp(56)
@@ -35,7 +35,7 @@ Builder.load_string(
                 role: "small"
                 valign: "center"
 
-        # محتوای قابل اسکرول
+        # Scrollable content
         MDScrollView:
             do_scroll_x: False
 
@@ -46,7 +46,7 @@ Builder.load_string(
                 padding: dp(16)
                 spacing: dp(16)
 
-                # کارت سربرگ شغل شامل عنوان، شرکت، کشور و دسته‌بندی
+                # Job header card with title, company, country and category
                 MDCard:
                     id: header_card
                     orientation: "vertical"
@@ -79,7 +79,7 @@ Builder.load_string(
                         role: "medium"
                         theme_text_color: "Secondary"
 
-                    # ردیف کشور و دسته‌بندی
+                    # Country and category row
                     MDBoxLayout:
                         size_hint_y: None
                         height: dp(30)
@@ -87,7 +87,7 @@ Builder.load_string(
 
                         Widget:
 
-                        # کشور
+                        # Country
                         MDBoxLayout:
                             size_hint_x: None
                             width: self.minimum_width
@@ -105,7 +105,7 @@ Builder.load_string(
                                 text: "Country"
                                 adaptive_width: True
 
-                        # دسته‌بندی
+                        # Category
                         MDBoxLayout:
                             size_hint_x: None
                             width: self.minimum_width
@@ -125,7 +125,7 @@ Builder.load_string(
 
                         Widget:
 
-                # کارت حقوق و دستمزد
+                # Salary card
                 MDCard:
                     id: salary_card
                     orientation: "vertical"
@@ -161,7 +161,7 @@ Builder.load_string(
                                 font_style: "Headline"
                                 role: "small"
 
-                # کارت توضیحات شغل
+                # Job description card
                 MDCard:
                     id: desc_card
                     orientation: "vertical"
@@ -193,7 +193,7 @@ Builder.load_string(
                         height: self.texture_size[1]
                         text_size: self.width, None
 
-                # دکمه ارسال درخواست شغلی
+                # Apply for job button
                 MDButton:
                     id: apply_btn
                     style: "filled"
@@ -209,7 +209,7 @@ Builder.load_string(
                         text: "Apply Now"
                         font_style: "Title"
 
-                # فضای خالی پایین
+                # Bottom spacing
                 Widget:
                     size_hint_y: None
                     height: dp(20)
@@ -217,13 +217,13 @@ Builder.load_string(
 )
 
 
-# کلاس صفحه جزئیات شغل - نمایش اطلاعات کامل آگهی
+# Job detail screen class - display complete listing information
 class JobDetailScreen(MDScreen):
-    """صفحه نمایش اطلاعات کامل آگهی شغلی"""
+    """Screen for displaying complete job listing information"""
 
-    # پر کردن اطلاعات شغل هنگام ورود به صفحه
+    # Populate job information when entering the screen
     def on_enter(self):
-        """پر کردن جزئیات شغل هنگام ورود به صفحه"""
+        """Populate job details when entering the screen"""
         from kivymd.app import MDApp
         from utils.helpers import format_salary
 
@@ -238,12 +238,12 @@ class JobDetailScreen(MDScreen):
             self.ids.job_salary.text = format_salary(job.salary)
             self.ids.job_description.text = job.description
 
-        # اجرای انیمیشن کارت‌ها
+        # Run card animations
         Clock.schedule_once(self._animate_cards, 0.1)
 
-    # انیمیشن ورودی کارت‌ها به ترتیب
+    # Sequential card entry animations
     def _animate_cards(self, dt):
-        """انیمیشن ورودی کارت‌ها"""
+        """Card entry animations"""
         cards = [
             self.ids.header_card,
             self.ids.salary_card,
@@ -256,9 +256,9 @@ class JobDetailScreen(MDScreen):
                 lambda dt, c=card: Animation(opacity=1, duration=0.3).start(c), i * 0.1
             )
 
-    # مدیریت ارسال درخواست شغلی و نمایش دیالوگ تایید
+    # Handle job application submission and show confirmation dialog
     def apply_for_job(self):
-        """مدیریت ارسال درخواست شغلی"""
+        """Handle job application submission"""
         from kivymd.app import MDApp
         from kivymd.uix.dialog import (
             MDDialog,
@@ -271,12 +271,12 @@ class JobDetailScreen(MDScreen):
         app = MDApp.get_running_app()
         job = app.selected_job
 
-        # ساخت پیام تایید ارسال درخواست
+        # Build submission confirmation message
         message = (
             f"Your application for '{job.title}' at {job.company} has been submitted!"
         )
 
-        # بررسی وجود رزومه کاربر و نمایش پیام مناسب
+        # Check for user resume and show appropriate message
         if app.current_user and app.current_user.resume_path:
             message += "\n\nYour resume has been attached to the application."
         else:
@@ -284,7 +284,7 @@ class JobDetailScreen(MDScreen):
                 "\n\nTip: Upload a resume in your profile to improve your chances!"
             )
 
-        # ساخت و نمایش دیالوگ تایید ارسال درخواست
+        # Build and show submission confirmation dialog
         dialog = MDDialog(
             MDDialogHeadlineText(text="Application Submitted!"),
             MDDialogSupportingText(text=message),

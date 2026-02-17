@@ -1,5 +1,5 @@
 """
-صفحه خوش‌آمدگویی - اولین صفحه‌ای که هنگام اجرای برنامه نمایش داده می‌شود
+Welcome Screen - The first screen displayed when the app launches
 """
 
 from kivy.lang import Builder
@@ -8,7 +8,7 @@ from kivy.clock import Clock
 from kivymd.uix.screen import MDScreen
 
 
-# بارگذاری رابط کاربری صفحه خوش‌آمدگویی با زبان KV
+# Load welcome screen UI with KV language
 Builder.load_string(
     """
 <WelcomeScreen>:
@@ -18,11 +18,11 @@ Builder.load_string(
         orientation: "vertical"
         md_bg_color: app.theme_cls.backgroundColor
 
-        # فضای خالی بالا
+        # Top spacing
         Widget:
             size_hint_y: 0.15
 
-        # ناحیه لوگو و عنوان برنامه
+        # Logo and title area
         MDBoxLayout:
             orientation: "vertical"
             size_hint_y: 0.35
@@ -56,11 +56,11 @@ Builder.load_string(
                 theme_text_color: "Secondary"
                 opacity: 0
 
-        # فضای خالی میانی
+        # Middle spacing
         Widget:
             size_hint_y: 0.1
 
-        # ناحیه دکمه‌های ورود و ثبت‌نام
+        # Login and register buttons area
         MDBoxLayout:
             id: buttons_box
             orientation: "vertical"
@@ -69,7 +69,7 @@ Builder.load_string(
             spacing: dp(15)
             opacity: 0
 
-            # دکمه ورود به حساب کاربری
+            # Login button
             MDButton:
                 style: "filled"
                 size_hint_x: 1
@@ -83,7 +83,7 @@ Builder.load_string(
                     text: "Login"
                     font_style: "Title"
 
-            # دکمه ساخت حساب کاربری جدید
+            # Create new account button
             MDButton:
                 style: "outlined"
                 size_hint_x: 1
@@ -97,7 +97,7 @@ Builder.load_string(
                     text: "Create Account"
                     font_style: "Title"
 
-        # فوتر برنامه - نمایش کپی‌رایت
+        # App footer - copyright notice
         MDBoxLayout:
             size_hint_y: 0.1
             padding: dp(20)
@@ -112,36 +112,36 @@ Builder.load_string(
 )
 
 
-# کلاس صفحه خوش‌آمدگویی با انیمیشن‌های ورودی
+# Welcome screen class with entry animations
 class WelcomeScreen(MDScreen):
-    """صفحه خوش‌آمدگویی با معرفی برنامه"""
+    """Welcome screen with app introduction"""
 
-    # اجرای انیمیشن‌ها هنگام ورود به صفحه
+    # Run animations when entering the screen
     def on_enter(self):
-        """اجرای انیمیشن‌ها هنگام نمایش صفحه"""
+        """Run animations when the screen is displayed"""
         Clock.schedule_once(self._start_animations, 0.2)
 
-    # شروع انیمیشن‌های ورودی عناصر صفحه
+    # Start entry animations for screen elements
     def _start_animations(self, dt):
-        """شروع انیمیشن‌های ورودی"""
-        # انیمیشن لوگو
+        """Start entry animations"""
+        # Logo animation
         logo = self.ids.logo_icon
         anim_logo = Animation(opacity=1, duration=0.5)
         anim_logo.start(logo)
 
-        # انیمیشن عنوان با تاخیر
+        # Title animation with delay
         title = self.ids.title_label
         Clock.schedule_once(
             lambda dt: Animation(opacity=1, duration=0.5).start(title), 0.2
         )
 
-        # انیمیشن زیرعنوان با تاخیر بیشتر
+        # Subtitle animation with more delay
         subtitle = self.ids.subtitle_label
         Clock.schedule_once(
             lambda dt: Animation(opacity=1, duration=0.5).start(subtitle), 0.4
         )
 
-        # انیمیشن دکمه‌ها با تاخیر بیشتر
+        # Buttons animation with more delay
         buttons = self.ids.buttons_box
         Clock.schedule_once(
             lambda dt: Animation(opacity=1, duration=0.5).start(buttons), 0.6

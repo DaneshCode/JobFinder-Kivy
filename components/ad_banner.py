@@ -1,6 +1,6 @@
 """
-کامپوننت بنر تبلیغاتی
-نمایش تبلیغات چرخشی در پایین صفحات با تصادفی‌سازی وزن‌دار
+Ad Banner Component
+Displays rotating advertisements at the bottom of screens with weighted randomization
 """
 
 from kivy.lang import Builder
@@ -10,7 +10,7 @@ from kivy.properties import ObjectProperty, StringProperty
 from kivymd.uix.boxlayout import MDBoxLayout
 
 
-# بارگذاری رابط کاربری بنر تبلیغاتی با زبان KV
+# Load ad banner UI with KV language
 Builder.load_string(
     """
 <AdBanner>:
@@ -78,11 +78,11 @@ Builder.load_string(
 )
 
 
-# کلاس بنر تبلیغاتی با قابلیت چرخش خودکار تبلیغات
+# Ad banner class with automatic ad rotation
 class AdBanner(MDBoxLayout):
-    """بنر تبلیغاتی با چرخش خودکار"""
+    """Ad banner with automatic rotation"""
 
-    # ویژگی‌های قابل مشاهده در رابط کاربری
+    # UI-visible properties
     current_title = StringProperty("Advertisement")
     current_description = StringProperty("Loading...")
     current_icon = StringProperty("bullhorn")
@@ -90,21 +90,21 @@ class AdBanner(MDBoxLayout):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # بازه زمانی چرخش تبلیغات به ثانیه
+        # Ad rotation interval in seconds
         self.rotation_interval = 10
         self._rotation_event = None
-        # راه‌اندازی تبلیغات با تاخیر کوتاه
+        # Initialize ads with a short delay
         Clock.schedule_once(self._init_ads, 0.5)
 
-    # مقداردهی اولیه و شروع چرخش تبلیغات
+    # Initialize and start ad rotation
     def _init_ads(self, dt):
-        """مقداردهی اولیه چرخش تبلیغات"""
+        """Initialize ad rotation"""
         self.load_next_ad()
         self.start_rotation()
 
-    # شروع تایمر چرخش تبلیغات
+    # Start ad rotation timer
     def start_rotation(self):
-        """شروع تایمر چرخش تبلیغات"""
+        """Start ad rotation timer"""
         if self._rotation_event:
             self._rotation_event.cancel()
 
@@ -112,32 +112,32 @@ class AdBanner(MDBoxLayout):
             self._rotate_ad, self.rotation_interval
         )
 
-    # توقف چرخش تبلیغات
+    # Stop ad rotation
     def stop_rotation(self):
-        """توقف چرخش تبلیغات"""
+        """Stop ad rotation"""
         if self._rotation_event:
             self._rotation_event.cancel()
             self._rotation_event = None
 
-    # چرخش به تبلیغ بعدی با انیمیشن محو شدن
+    # Rotate to next ad with fade animation
     def _rotate_ad(self, dt):
-        """چرخش به تبلیغ بعدی با انیمیشن"""
-        # محو کردن تبلیغ فعلی
+        """Rotate to next ad with animation"""
+        # Fade out current ad
         card = self.ids.ad_card
         anim_out = Animation(opacity=0, duration=0.3)
         anim_out.bind(on_complete=lambda *args: self._load_and_fade_in())
         anim_out.start(card)
 
-    # بارگذاری تبلیغ بعدی و نمایش با انیمیشن ظاهر شدن
+    # Load next ad and show with fade-in animation
     def _load_and_fade_in(self):
-        """بارگذاری تبلیغ بعدی و نمایش با انیمیشن"""
+        """Load next ad and show with animation"""
         self.load_next_ad()
         card = self.ids.ad_card
         Animation(opacity=1, duration=0.3).start(card)
 
-    # بارگذاری تبلیغ تصادفی وزن‌دار از دیتابیس
+    # Load weighted random ad from database
     def load_next_ad(self):
-        """بارگذاری تبلیغ تصادفی وزن‌دار بعدی"""
+        """Load next weighted random ad"""
         from database import DatabaseManager
 
         db = DatabaseManager()
@@ -149,14 +149,14 @@ class AdBanner(MDBoxLayout):
             self.current_description = ad.description
             self.current_icon = ad.icon
         else:
-            # نمایش تبلیغ پیش‌فرض در صورت نبود تبلیغ در دیتابیس
+            # Show default ad if no ads in database
             self.current_title = "Job Finder"
             self.current_description = "Find your dream job today!"
             self.current_icon = "briefcase-search"
 
-    # مدیریت کلیک روی تبلیغ و نمایش جزئیات در دیالوگ
+    # Handle ad click and show details in dialog
     def on_ad_click(self):
-        """مدیریت کلیک روی تبلیغ"""
+        """Handle ad click"""
         from kivymd.uix.dialog import (
             MDDialog,
             MDDialogHeadlineText,
@@ -165,7 +165,7 @@ class AdBanner(MDBoxLayout):
         )
         from kivymd.uix.button import MDButton, MDButtonText
 
-        # تنظیم محتوای دیالوگ بر اساس تبلیغ فعلی
+        # Set dialog content based on current ad
         if self.current_ad:
             message = (
                 f"Company: {self.current_ad.company}\n\n{self.current_ad.description}"
@@ -175,7 +175,7 @@ class AdBanner(MDBoxLayout):
             message = "Check out our latest job listings!"
             title = "Job Finder"
 
-        # ساخت و نمایش دیالوگ جزئیات تبلیغ
+        # Build and show ad detail dialog
         dialog = MDDialog(
             MDDialogHeadlineText(text=title),
             MDDialogSupportingText(text=message),

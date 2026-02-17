@@ -1,1 +1,1 @@
-# پکیج کامپوننت‌ها - شامل اجزای رابط کاربری قابل استفاده مجدد
+# Components package - contains reusable UI components

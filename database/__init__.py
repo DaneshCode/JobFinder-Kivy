@@ -1,4 +1,4 @@
-# مسیر فایل: پکیج پایگاه داده
-# ایمپورت کلاس‌های اصلی پایگاه داده برای دسترسی آسان
+# Database package
+# Import main database classes for easy access
 from .db_manager import DatabaseManager
 from .models import User, Job, Advertisement

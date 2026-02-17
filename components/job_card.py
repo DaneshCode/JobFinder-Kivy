@@ -1,6 +1,6 @@
 """
-کامپوننت کارت شغلی
-کارت قابل استفاده مجدد برای نمایش لیست آگهی‌های شغلی
+Job Card Component
+Reusable card for displaying job listings
 """
 
 from kivy.lang import Builder
@@ -11,7 +11,7 @@ from kivymd.uix.boxlayout import MDBoxLayout
 from utils.helpers import format_salary
 
 
-# بارگذاری رابط کاربری کارت شغلی با زبان KV
+# Load job card UI with KV language
 Builder.load_string(
     """
 <JobCard>:
@@ -23,7 +23,7 @@ Builder.load_string(
     style: "elevated"
     on_release: root.on_card_click()
 
-    # سربرگ شامل عنوان شغل و نام شرکت
+    # Header containing job title and company name
     MDBoxLayout:
         size_hint_y: None
         height: dp(50)
@@ -58,13 +58,13 @@ Builder.load_string(
 
     MDDivider:
 
-    # ردیف جزئیات شامل کشور و دسته‌بندی
+    # Details row containing country and category
     MDBoxLayout:
         size_hint_y: None
         height: dp(30)
         spacing: dp(20)
 
-        # کشور
+        # Country
         MDBoxLayout:
             size_hint_x: None
             width: self.minimum_width
@@ -85,7 +85,7 @@ Builder.load_string(
                 font_style: "Label"
                 role: "large"
 
-        # دسته‌بندی شغلی
+        # Job category
         MDBoxLayout:
             size_hint_x: None
             width: self.minimum_width
@@ -108,7 +108,7 @@ Builder.load_string(
 
         Widget:
 
-    # ردیف حقوق و دستمزد
+    # Salary row
     MDBoxLayout:
         size_hint_y: None
         height: dp(30)
@@ -131,11 +131,11 @@ Builder.load_string(
 )
 
 
-# کلاس کارت شغلی قابل استفاده مجدد
+# Reusable job card class
 class JobCard(MDCard):
-    """کامپوننت کارت شغلی قابل استفاده مجدد"""
+    """Reusable job card component"""
 
-    # ویژگی‌های نمایشی کارت شغلی
+    # Job card display properties
     job_title = StringProperty("")
     company = StringProperty("")
     country = StringProperty("")
@@ -145,16 +145,16 @@ class JobCard(MDCard):
     job_data = ObjectProperty(None, allownone=True)
     callback = ObjectProperty(None, allownone=True)
 
-    # مدیریت کلیک روی کارت شغلی
+    # Handle job card click
     def on_card_click(self):
-        """مدیریت کلیک روی کارت"""
+        """Handle card click"""
         if self.callback and self.job_data:
             self.callback(self.job_data)
 
 
-# تابع کارخانه‌ای برای ساخت کارت شغلی از شیء Job
+# Factory function to create a job card from a Job object
 def create_job_card(job, callback=None):
-    """تابع کارخانه‌ای برای ساخت کارت شغلی از شیء Job"""
+    """Factory function to create a job card from a Job object"""
     return JobCard(
         job_title=job.title,
         company=job.company,
